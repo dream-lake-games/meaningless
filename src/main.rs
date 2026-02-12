@@ -6,7 +6,8 @@ mod gol;
 mod level;
 mod player;
 
-pub const WINDOW_SIZE: u32 = 640;
+pub const INTERNAL_SIZE: u32 = 640;
+pub const WINDOW_SIZE: u32 = INTERNAL_SIZE;
 pub const TILE_SIZE: f32 = 32.0;
 
 fn main() {
@@ -19,6 +20,7 @@ fn main() {
                         resolution: WindowResolution::new(WINDOW_SIZE, WINDOW_SIZE),
                         fit_canvas_to_parent: false,
                         prevent_default_event_handling: true,
+                        resizable: false,
                         ..default()
                     }),
                     ..default()
