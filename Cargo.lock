@@ -369,52 +369,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "bevy-tnua"
-version = "0.30.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "3fae9541f18c04b2205ccb56b3dc6eace3d23f448b538cfc9beda8604ea7badf"
-dependencies = [
- "bevy",
- "bevy-tnua-macros",
- "bevy-tnua-physics-integration-layer",
- "ron",
- "serde",
- "thiserror 2.0.18",
-]
-
-[[package]]
-name = "bevy-tnua-avian2d"
-version = "0.10.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "6da5ebdaa19972536b2bca939af5cfe4149f7d2fc07d8f1ceb60865a1225950e"
-dependencies = [
- "avian2d",
- "bevy",
- "bevy-tnua-physics-integration-layer",
-]
-
-[[package]]
-name = "bevy-tnua-macros"
-version = "0.2.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2838ba099375659a700a86aa03353d0e5ee5d2bb692d8f893cdd49b20494efde"
-dependencies = [
- "convert_case 0.10.0",
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "bevy-tnua-physics-integration-layer"
-version = "0.12.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "c187fdd14d306c8bf5369bd2cc4bab39d5056643229389e6663d8a5751f2c4a0"
-dependencies = [
- "bevy",
-]
-
-[[package]]
 name = "bevy_a11y"
 version = "0.18.0"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -3351,8 +3305,6 @@ version = "0.1.0"
 dependencies = [
  "avian2d",
  "bevy",
- "bevy-tnua",
- "bevy-tnua-avian2d",
  "bevy_ecs_ldtk",
 ]
 

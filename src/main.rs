@@ -1,8 +1,5 @@
-use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy::window::WindowResolution;
-use bevy_tnua::prelude::*;
-use bevy_tnua_avian2d::*;
 
 mod camera;
 mod gol;
@@ -28,12 +25,7 @@ fn main() {
                 })
                 .set(ImagePlugin::default_nearest()),
         )
-        .add_plugins(PhysicsPlugins::default())
-        .add_plugins(TnuaControllerPlugin::<player::PlayerScheme>::new(
-            FixedPostUpdate,
-        ))
-        .add_plugins(TnuaAvian2dPlugin::new(FixedPostUpdate))
-        .insert_resource(Gravity(Vec2::new(0.0, -800.0)))
+        .add_plugins(avian2d::prelude::PhysicsPlugins::default())
         .add_plugins((
             camera::camera_plugin_fn,
             player::player_plugin_fn,
