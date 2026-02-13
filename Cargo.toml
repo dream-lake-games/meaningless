@@ -8,6 +8,12 @@ bevy = "0.18"
 avian2d = "0.5"
 bevy_ecs_ldtk = "0.14"
 
+[build-dependencies]
+toml = "0.8"
+
+[target.'cfg(not(target_family = "wasm"))'.dependencies]
+bevy = { version = "0.18", features = ["file_watcher"] }
+
 [profile.dev]
 opt-level = 0
 

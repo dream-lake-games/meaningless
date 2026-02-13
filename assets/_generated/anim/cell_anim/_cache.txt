@@ -1,0 +1,6 @@
+locked,1,48,48
+never,1,48,48
+stable,1,48,48
+scared,1,48,48
+pending,1,48,48
+slain,1,48,48

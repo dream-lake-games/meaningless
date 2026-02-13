@@ -1,0 +1,5 @@
+[[anim]]
+name = "CellAnim"
+file = "assets/cell/cell.aseprite"
+default = "Stable"
+fps = 8

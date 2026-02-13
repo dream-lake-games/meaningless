@@ -1,12 +1,10 @@
 # Game of Life Platformer — Implementation Plan
 
-## Dependencies (all confirmed Bevy 0.18 compatible)
+## Dependencies (Bevy 0.18)
 
 - `bevy = "0.18"` (default features — includes 2D, windowing, WASM support)
-- `avian2d = "0.5"` (ECS-native 2D physics)
-- `bevy-tnua = "0.30"` (floating character controller)
-- `bevy-tnua-avian2d = "0.10"` (Tnua/Avian glue)
-- `bevy_ecs_ldtk = "0.14"` (LDtk level loading)
+- `avian2d = "0.5"` (ECS-native 2D physics — used for collision detection via `SpatialQuery`)
+- `bevy_ecs_ldtk = "0.14"` (LDtk level loading — not yet used)
 
 ## Project Structure
 
@@ -14,13 +12,14 @@
 meaningless/
   src/
     main.rs        — App setup, DefaultPlugins, window, top-level plugin registration
-    player.rs      — TnuaScheme, player spawn, input system
-    camera.rs      — Smooth-follow camera
-    level.rs       — LDtk loading, IntGrid -> grid state, platform entity spawning
-    gol.rs         — Game of Life tick timer, simulation, spawn/despawn/death logic
+    player.rs      — Custom kinematic player controller with shape-cast collision
+    camera.rs      — Pixel-perfect camera with deadzone follow
+    level.rs       — LDtk level loading, cell bundles, player spawn
+    gol.rs         — Game of Life simulation, GridState resource
+    game_state.rs  — GameState enum, LevelGrid, menus (Milestone 5)
   assets/
     levels/
-      world.ldtk   — LDtk project (user creates this in the LDtk app)
+      play.ldtk    — LDtk project with multiple levels
   index.html       — Trunk WASM entry point (640x640 canvas, pixelated rendering)
   Trunk.toml       — Trunk build config
   Cargo.toml
@@ -30,29 +29,37 @@ No `lib.rs`. Just `main.rs` with `mod` declarations. Each module exposes a `pub 
 
 ## Status
 
-- Milestone 1 — DONE (with known issue: Tnua float spring still feels off, needs tuning)
-- Milestone 2 — next
-- Milestone 3 — pending
+- Milestone 1 — DONE
+- Milestone 2 — DONE
+- Milestone 3 — next
 - Milestone 4 — pending
+- Milestone 5 — pending
 
-## Milestone 1 — Skeleton: Window, WASM, Camera, Player Rectangle (DONE)
+## Milestone 1 — Skeleton: Window, Camera, Player Rectangle (DONE)
 
-**Goal:** Green rectangle on screen, compiles to WASM, camera follows it.
+**Goal:** Green rectangle on screen, pixel-perfect rendering, camera follows player.
 
 **What was built:**
 
-- `Cargo.toml` with all deps + dev profile optimizations
-- `index.html` — 640x640 canvas, centered, pixelated rendering
-- `Trunk.toml` — basic build config
-- `main.rs` — App with DefaultPlugins (640x640 window, nearest-neighbor image filtering), registers all plugin functions
-- `player.rs` — `Player` marker, green `Sprite` as child entity offset down by float gap, `RigidBody::Dynamic` + `Collider`, `TnuaController` with `PlayerScheme`, WASD movement + J to jump, `LockedAxes`, `TransformInterpolation`, `SpeculativeMargin`
-- `camera.rs` — `GameCamera` marker, snaps to player position in `PostUpdate` (no lerp to avoid flicker with physics interpolation)
+- `Cargo.toml` with deps + dev profile optimizations (opt-level 0 for local, 3 for dependencies)
+- `main.rs` — App with DefaultPlugins (640x640 window, nearest-neighbor image filtering via `ImagePlugin::default_nearest()`), Avian `PhysicsPlugins`, registers all plugin functions. Constants: `INTERNAL_SIZE = 640`, `TILE_SIZE = 32`
+- `player.rs` — Custom kinematic character controller:
+  - `Player` marker + `PlayerState` component tracking velocity, grounded state, timers
+  - Shape-cast collision using Avian's `SpatialQuery` (no rigidbody on player — fully kinematic)
+  - Acceleration-based horizontal movement (different accel/decel for ground vs air)
+  - Variable-height jump (release early = lower jump via gravity multiplier)
+  - Coyote time (0.16s grace period after leaving ground)
+  - Jump buffering (0.16s input buffer before landing)
+  - Collision skin to prevent tunneling
+- `camera.rs` — Pixel-perfect rendering setup:
+  - Two-camera system: `InGameCamera` renders to an offscreen texture at internal resolution, `OuterCamera` displays that texture scaled up
+  - `RenderLayers` to separate pixel-perfect content from the upscaled canvas
+  - Deadzone-based follow: camera stays still while player is within a box (16px horizontal, 24px vertical), only moves when player pushes past edges
+  - Smooth catch-up when following (lerp with `CATCH_UP_SPEED = 8.0`) to avoid jarring snaps
 - `level.rs` — Hardcoded ground + 5 platforms with `RigidBody::Static` + `Collider::rectangle`
 - `gol.rs` — Empty plugin stub
 
-**Controls:** A/D to move, J to jump
-
-**Known issue:** Tnua floating character controller spring tuning still not perfect — character can clip slightly or feel floaty. May need to revisit approach (consider simpler kinematic character controller if Tnua keeps fighting us).
+**Controls:** A/D to move, J to jump (hold for higher jump)
 
 ## Milestone 2 — LDtk Integration
 
@@ -91,33 +98,92 @@ No `lib.rs`. Just `main.rs` with `mod` declarations. Each module exposes a `pub 
 
 **Test:** Load a level with GoL patterns (glider, blinker). Watch platforms appear/disappear every 0.75s. Try to survive. Try getting crushed.
 
-## Milestone 4 — Double Jump + Coyote Time + Polish
+## Milestone 4 — Double Jump + Polish
 
 **Goal:** Game feels good to play.
 
 **What to build:**
 
-- `player.rs` — Double jump (track air jump count, allow one additional jump while airborne). Tune walk/jump configs for:
-  - Generous coyote time
-  - Variable-height jump (hold = higher, tap = lower — Tnua does this by default)
-- `camera.rs` — Tune follow, maybe add slight lookahead in movement direction
+- `player.rs` — Double jump (track air jump count, allow one additional jump while airborne)
 - `gol.rs` — Tune tick rate, add visual feedback before tick (stretch goal)
-- General: tune gravity, movement speed, jump height until it feels right
+- General: tune movement constants until it feels right
 
 **Test:** Full gameplay loop. Run, jump, double jump across evolving GoL platforms.
 
+## Milestone 5 — Menus & Grid Progression
+
+**Goal:** Main menu, grid-based level select, progress persistence.
+
+**Game States:**
+
+```rust
+#[derive(States, Default, Clone, PartialEq, Eq, Hash)]
+enum GameState {
+    #[default]
+    Menu,
+    LevelSelect,
+    Playing,
+}
+```
+
+All gameplay systems get `.run_if(in_state(GameState::Playing))`. Menu/UI systems run in their respective states. `OnEnter`/`OnExit` schedules handle setup and teardown.
+
+**Level Grid Resource:**
+
+```rust
+#[derive(Resource)]
+struct LevelGrid {
+    width: usize,
+    height: usize,
+    unlocked: HashSet<IVec2>,
+    completed: HashSet<IVec2>,
+    current: Option<IVec2>,
+}
+```
+
+- Grid position `(x, y)` maps to LDtk level index `y * width + x`
+- Starting state: only `(0, 0)` unlocked
+- Completing a level unlocks 4-adjacent neighbors (up/down/left/right)
+
+**What to build:**
+
+- `game_state.rs` — `GameState` enum, `LevelGrid` resource, state transition systems
+- Menu screen: simple "Play" button → `LevelSelect`
+- Level select screen: render grid, locked levels greyed out, completed levels show checkmark, arrow key navigation, Enter to select
+- Win condition: add `Goal` entity in LDtk, trigger `LevelCompleteEvent` when player touches it
+- On level complete: call `grid.complete_level(pos)`, transition to `LevelSelect`
+- Persistence: serialize `unlocked` + `completed` to JSON. Native: write to config dir. WASM: browser localStorage via `bevy_pkv` or `web-sys`
+- Backspace to restart current level (despawn + respawn level entities)
+
+**Test:** Start game, see menu. Enter level select, only (0,0) available. Beat level, adjacent levels unlock. Quit and relaunch, progress persists.
+
 ## Key Architecture Decisions
 
-- **Platform entities are ECS entities with Collider** — toggled via `Visibility` + adding/removing `Collider` rather than spawn/despawn, to avoid entity churn
-- **GoL state is a `Resource` grid** — canonical source of truth, platform entities sync to it each tick
-- **Player death is an event** — `PlayerDeathEvent` so we can later add animations, screen shake, etc.
-- **Gravity:** `Gravity(Vec2::new(0.0, -800.0))` — Avian default (9.81) is too weak for pixel units
-- **Tnua float height** must be > half the player's collider height
+- **Custom kinematic controller** — Player uses shape-cast collision via `SpatialQuery` rather than a physics rigidbody. This gives precise control over movement feel without fighting the physics engine
+- **Pixel-perfect rendering** — Two-camera setup renders game at internal resolution then scales up, ensuring crisp pixels at any window size
+- **Deadzone camera** — Camera only moves when player pushes past edges of an invisible box, with smooth lerp catch-up. Feels more grounded than pure lerp follow
+- **Platform entities are ECS entities with Collider** — will be toggled via `Visibility` + adding/removing `Collider` rather than spawn/despawn, to avoid entity churn
+- **GoL state will be a `Resource` grid** — canonical source of truth, platform entities sync to it each tick
+- **Player death will be an event** — `PlayerDeathEvent` so we can later add animations, screen shake, etc.
+
+## Player Movement Constants
+
+```rust
+MOVE_SPEED: 200.0      // Target horizontal velocity
+GROUND_ACCEL: 8000.0   // Acceleration when grounded
+GROUND_DECEL: 8000.0   // Deceleration when grounded (no input)
+AIR_ACCEL: 5000.0      // Acceleration in air
+AIR_DECEL: 2400.0      // Deceleration in air (no input)
+JUMP_VELOCITY: 365.0   // Initial upward velocity on jump
+GRAVITY: -900.0        // Downward acceleration
+JUMP_CUT_MULT: 2.2     // Gravity multiplier when jump released early
+MAX_FALL_SPEED: -400.0 // Terminal velocity
+COYOTE_TIME: 0.16      // Grace period after leaving ground
+JUMP_BUFFER: 0.16      // Input buffer before landing
+```
 
 ## Logging Strategy
 
-- `info!` on app startup: window size, tile size, gravity
-- `info!` on level load: grid dimensions, permanent cell count, dynamic cell count, player spawn position
+- `info!` on level load: platform count, player spawn position
 - `info!` on each GoL tick: tick number, cells born, cells died, total alive
 - `warn!` on player death with cause (crush / fell off screen)
-- `debug!` on player state changes (grounded, airborne, double-jumped)

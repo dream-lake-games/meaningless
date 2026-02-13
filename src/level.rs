@@ -1,55 +1,134 @@
 use avian2d::prelude::*;
 use bevy::prelude::*;
+use bevy_ecs_ldtk::prelude::*;
 
+use crate::anim::AnimMan;
+use crate::animations::CellAnim;
+use crate::gol::{SpawnPosition, GHOST_ALPHA};
+use crate::player::{spawn_player, Player};
 use crate::TILE_SIZE;
 
-const GROUND_WIDTH: f32 = TILE_SIZE * 20.0;
-const GROUND_COLOR: Color = Color::srgb(0.15, 0.15, 0.15);
-const PLATFORM_COLOR: Color = Color::srgb(0.3, 0.3, 0.3);
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub struct LevelSystemSet;
 
-fn spawn_hardcoded_level(mut commands: Commands) {
-    // Ground
-    commands.spawn((
-        Name::new("Ground"),
-        Sprite {
-            color: GROUND_COLOR,
-            custom_size: Some(Vec2::new(GROUND_WIDTH, TILE_SIZE)),
-            ..default()
-        },
-        Transform::from_xyz(0.0, -TILE_SIZE * 4.0, 0.0),
-        RigidBody::Static,
-        Collider::rectangle(GROUND_WIDTH, TILE_SIZE),
-    ));
+#[derive(Component, Default)]
+pub struct PermanentCell;
 
-    let platforms = [
-        Vec2::new(-TILE_SIZE * 3.0, -TILE_SIZE * 2.0),
-        Vec2::new(0.0, 0.0),
-        Vec2::new(TILE_SIZE * 3.0, TILE_SIZE * 2.0),
-        Vec2::new(TILE_SIZE * 6.0, TILE_SIZE * 2.0),
-        Vec2::new(-TILE_SIZE * 6.0, TILE_SIZE * 1.0),
-    ];
+#[derive(Component, Default)]
+pub struct DynamicCell;
 
-    for (i, pos) in platforms.iter().enumerate() {
-        let width = TILE_SIZE * 3.0;
-        commands.spawn((
-            Name::new(format!("Platform {}", i)),
-            Sprite {
-                color: PLATFORM_COLOR,
-                custom_size: Some(Vec2::new(width, TILE_SIZE)),
-                ..default()
-            },
-            Transform::from_translation(pos.extend(0.0)),
+#[derive(Component, Default)]
+pub struct NeverCell;
+
+#[derive(Component, Default)]
+pub struct PlayerSpawn;
+
+#[derive(Bundle, LdtkIntCell, Default)]
+pub struct PermanentCellBundle {
+    marker: PermanentCell,
+}
+
+#[derive(Bundle, LdtkIntCell, Default)]
+pub struct DynamicCellBundle {
+    marker: DynamicCell,
+}
+
+#[derive(Bundle, LdtkIntCell, Default)]
+pub struct NeverCellBundle {
+    marker: NeverCell,
+}
+
+#[derive(Bundle, LdtkEntity, Default)]
+pub struct PlayerSpawnBundle {
+    marker: PlayerSpawn,
+}
+
+fn setup_level(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn(LdtkWorldBundle {
+        ldtk_handle: asset_server.load("levels/play.ldtk").into(),
+        ..default()
+    });
+}
+
+fn add_permanent_cell_visuals(
+    mut commands: Commands,
+    query: Query<Entity, (Added<PermanentCell>, Without<RigidBody>)>,
+) {
+    for entity in &query {
+        commands.entity(entity).insert((
+            AnimMan::new(CellAnim::Locked),
+            Visibility::Inherited,
             RigidBody::Static,
-            Collider::rectangle(width, TILE_SIZE),
+            Collider::rectangle(TILE_SIZE, TILE_SIZE),
         ));
     }
+}
 
-    info!(
-        "Hardcoded level spawned: ground + {} platforms",
-        platforms.len()
-    );
+fn add_never_cell_visuals(
+    mut commands: Commands,
+    query: Query<Entity, Added<NeverCell>>,
+) {
+    for entity in &query {
+        commands.entity(entity).insert((
+            AnimMan::new(CellAnim::Never),
+            Visibility::Inherited,
+        ));
+    }
+}
+
+fn sync_never_cell_opacity(
+    cell_query: Query<&Children, With<NeverCell>>,
+    mut sprite_query: Query<&mut Sprite>,
+) {
+    for children in &cell_query {
+        for child in children.iter() {
+            if let Ok(mut sprite) = sprite_query.get_mut(child) {
+                sprite.color = sprite.color.with_alpha(GHOST_ALPHA);
+            }
+        }
+    }
+}
+
+fn spawn_player_at_spawn_point(
+    mut commands: Commands,
+    spawn_query: Query<&Transform, Added<PlayerSpawn>>,
+    existing_players: Query<Entity, With<Player>>,
+    mut spawn_pos: ResMut<SpawnPosition>,
+) {
+    for transform in &spawn_query {
+        for player_entity in &existing_players {
+            commands.entity(player_entity).despawn();
+        }
+
+        let pos = transform.translation.truncate();
+        spawn_pos.0 = Some(pos);
+        spawn_player(&mut commands, pos);
+        info!("Player spawned at ({}, {})", pos.x, pos.y);
+    }
 }
 
 pub fn level_plugin_fn(app: &mut App) {
-    app.add_systems(Startup, spawn_hardcoded_level);
+    app.add_plugins(LdtkPlugin)
+        .insert_resource(LevelSelection::index(0))
+        .insert_resource(LdtkSettings {
+            level_background: LevelBackground::Nonexistent,
+            int_grid_rendering: IntGridRendering::Invisible,
+            ..default()
+        })
+        .register_ldtk_int_cell::<PermanentCellBundle>(1)
+        .register_ldtk_int_cell::<DynamicCellBundle>(2)
+        .register_ldtk_int_cell::<NeverCellBundle>(3)
+        .register_ldtk_entity::<PlayerSpawnBundle>("PlayerSpawn")
+        .add_systems(Startup, setup_level)
+        .add_systems(
+            Update,
+            (
+                add_permanent_cell_visuals,
+                add_never_cell_visuals,
+                spawn_player_at_spawn_point,
+                sync_never_cell_opacity,
+            )
+                .chain()
+                .in_set(LevelSystemSet),
+        );
 }
