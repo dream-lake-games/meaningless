@@ -8,11 +8,13 @@ mod bg;
 mod camera;
 mod gol;
 mod level;
+mod menu;
+pub(crate) mod palette;
 mod player;
 
-pub const INTERNAL_SIZE: u32 = 320;
-pub const WINDOW_SIZE: u32 = INTERNAL_SIZE * 2;
-pub const TILE_SIZE: f32 = 32.0;
+pub(crate) const INTERNAL_SIZE: u32 = 320;
+pub(crate) const WINDOW_SIZE: u32 = INTERNAL_SIZE * 2;
+pub(crate) const TILE_SIZE: f32 = 32.0;
 
 fn main() {
     App::new()
@@ -38,6 +40,7 @@ fn main() {
         .add_plugins(avian2d::prelude::PhysicsPlugins::default())
         .add_plugins(anim::AnimPlugin::default())
         .add_plugins((
+            menu::menu_plugin_fn,
             bg::bg_plugin_fn,
             camera::camera_plugin_fn,
             player::player_plugin_fn,

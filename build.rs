@@ -11,7 +11,7 @@ fn main() {
 
     let anim_defs = scan_anim_defs("anim_defs");
     if anim_defs.is_empty() {
-        let stub = "pub fn register_all_anims(_app: &mut bevy::prelude::App) {}\n";
+        let stub = "pub(crate) fn register_all_anims(_app: &mut bevy::prelude::App) {}\n";
         fs::write(Path::new(&out_dir).join("animations.rs"), stub).unwrap();
         println!("cargo:rerun-if-changed=anim_defs");
         return;
@@ -297,7 +297,7 @@ fn generate_code(anims: &[ProcessedAnim]) -> String {
         code.push_str("\n\n");
     }
 
-    code.push_str("pub fn register_all_anims(app: &mut bevy::prelude::App) {\n");
+    code.push_str("pub(crate) fn register_all_anims(app: &mut bevy::prelude::App) {\n");
     for anim in anims {
         code.push_str(&format!(
             "    crate::anim::register_anim::<{}>(app);\n",
@@ -372,7 +372,7 @@ fn generate_single_anim(anim: &ProcessedAnim) -> String {
 
     format!(
         r#"#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum {name} {{
+pub(crate) enum {name} {{
     {variants}
 }}
 

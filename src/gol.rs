@@ -7,24 +7,25 @@ use crate::TILE_SIZE;
 use crate::anim::AnimMan;
 use crate::animations::CellAnim;
 use crate::level::{DynamicCell, LevelSystemSet, NeverCell, PermanentCell};
+use crate::menu::AppState;
 use crate::player::{Player, PlayerState};
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct GolSystemSet;
+pub(crate) struct GolSystemSet;
 
 const PLAYER_SIZE: f32 = 18.0;
 const CRUSH_THRESHOLD: f32 = 0.25;
 const HISTORY_CAP: usize = 256;
 
 #[derive(Resource, Default)]
-pub struct TickState {
-    pub previous: Option<HashSet<IVec2>>,
-    pub current: HashSet<IVec2>,
-    pub next: HashSet<IVec2>,
-    pub permanent: HashSet<IVec2>,
-    pub never: HashSet<IVec2>,
-    pub history: Vec<HashSet<IVec2>>,
-    pub initialized: bool,
+pub(crate) struct TickState {
+    pub(crate) previous: Option<HashSet<IVec2>>,
+    pub(crate) current: HashSet<IVec2>,
+    pub(crate) next: HashSet<IVec2>,
+    pub(crate) permanent: HashSet<IVec2>,
+    pub(crate) never: HashSet<IVec2>,
+    pub(crate) history: Vec<HashSet<IVec2>>,
+    pub(crate) initialized: bool,
 }
 
 impl TickState {
@@ -110,21 +111,21 @@ impl TickState {
 }
 
 #[derive(Resource, Default)]
-pub struct CellEntities {
-    pub map: HashMap<IVec2, Entity>,
+pub(crate) struct CellEntities {
+    pub(crate) map: HashMap<IVec2, Entity>,
 }
 
 #[derive(Resource, Default)]
-pub struct SpawnPosition(pub Option<Vec2>);
+pub(crate) struct SpawnPosition(pub(crate) Option<Vec2>);
 
 #[derive(Resource, Default)]
-pub struct RespawnTimer(pub Option<Timer>);
+pub(crate) struct RespawnTimer(pub(crate) Option<Timer>);
 
 #[derive(Resource, Default)]
-pub struct LevelEntity(pub Option<Entity>);
+pub(crate) struct LevelEntity(pub(crate) Option<Entity>);
 
 #[derive(Component)]
-pub struct GolCell;
+pub(crate) struct GolCell;
 
 fn init_from_ldtk(
     mut commands: Commands,
@@ -459,7 +460,7 @@ fn handle_respawn(
     }
 }
 
-pub const GHOST_ALPHA: f32 = 0.5;
+pub(crate) const GHOST_ALPHA: f32 = 0.5;
 
 fn sync_cell_opacity(
     cell_query: Query<(Option<&RigidBody>, &Children), With<GolCell>>,
@@ -475,7 +476,7 @@ fn sync_cell_opacity(
     }
 }
 
-pub fn gol_plugin_fn(app: &mut App) {
+pub(crate) fn gol_plugin_fn(app: &mut App) {
     app.init_resource::<TickState>()
         .init_resource::<CellEntities>()
         .init_resource::<SpawnPosition>()
@@ -493,6 +494,7 @@ pub fn gol_plugin_fn(app: &mut App) {
             )
                 .chain()
                 .in_set(GolSystemSet)
-                .after(LevelSystemSet),
+                .after(LevelSystemSet)
+                .run_if(in_state(AppState::Playing)),
         );
 }

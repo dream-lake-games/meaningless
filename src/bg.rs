@@ -1,13 +1,15 @@
 use bevy::prelude::*;
+use bevy::state::state_scoped::DespawnOnExit;
 
 use crate::camera::{InGameCamera, PIXEL_PERFECT_LAYERS};
+use crate::menu::AppState;
 
 const BG_Z: f32 = -100.0;
 
 #[derive(Component)]
-pub struct BgLayer {
-    pub parallax: f32,
-    pub tile_size: Vec2,
+pub(crate) struct BgLayer {
+    pub(crate) parallax: f32,
+    pub(crate) tile_size: Vec2,
 }
 
 #[derive(Component)]
@@ -23,6 +25,7 @@ fn spawn_background(mut commands: Commands, asset_server: Res<AssetServer>) {
             BgLayer { parallax, tile_size },
             Transform::from_xyz(0.0, 0.0, BG_Z),
             Visibility::Inherited,
+            DespawnOnExit::<AppState>::default(),
         ))
         .id();
 
@@ -74,7 +77,10 @@ fn update_background(
     }
 }
 
-pub fn bg_plugin_fn(app: &mut App) {
-    app.add_systems(Startup, spawn_background)
-        .add_systems(PostUpdate, update_background);
+pub(crate) fn bg_plugin_fn(app: &mut App) {
+    app.add_systems(OnEnter(AppState::Playing), spawn_background)
+        .add_systems(
+            PostUpdate,
+            update_background.run_if(in_state(AppState::Playing)),
+        );
 }

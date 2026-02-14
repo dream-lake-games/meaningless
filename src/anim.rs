@@ -7,7 +7,7 @@ use bevy::{
 use std::marker::PhantomData;
 
 #[derive(Component)]
-pub struct AnimSprite<A: Anim> {
+pub(crate) struct AnimSprite<A: Anim> {
     _phantom: PhantomData<A>,
 }
 
@@ -20,37 +20,37 @@ impl<A: Anim> Default for AnimSprite<A> {
 }
 
 #[derive(Component)]
-pub struct AnimCache<A: Anim> {
+pub(crate) struct AnimCache<A: Anim> {
     handles: Vec<Handle<Image>>,
     layouts: Vec<Handle<TextureAtlasLayout>>,
     _phantom: PhantomData<A>,
 }
 
 #[derive(Clone, Copy)]
-pub struct AnimVariant {
-    pub tag: &'static str,
-    pub fps: Option<f32>,
-    pub frame_count: usize,
-    pub frame_size: (u32, u32),
-    pub asset_path: &'static str,
-    pub next: AnimNextIndex,
+pub(crate) struct AnimVariant {
+    pub(crate) tag: &'static str,
+    pub(crate) fps: Option<f32>,
+    pub(crate) frame_count: usize,
+    pub(crate) frame_size: (u32, u32),
+    pub(crate) asset_path: &'static str,
+    pub(crate) next: AnimNextIndex,
 }
 
 #[derive(Clone, Copy)]
-pub enum AnimNextIndex {
+pub(crate) enum AnimNextIndex {
     Index(usize),
     Remove,
     Despawn,
 }
 
-pub trait Anim: Clone + Copy + Default + Send + Sync + 'static {
+pub(crate) trait Anim: Clone + Copy + Default + Send + Sync + 'static {
     fn table() -> &'static [AnimVariant];
     fn index(&self) -> usize;
     fn from_index(index: usize) -> Self;
 }
 
-pub struct AnimPlugin {
-    pub default_fps: f32,
+pub(crate) struct AnimPlugin {
+    pub(crate) default_fps: f32,
 }
 
 impl Default for AnimPlugin {
@@ -71,23 +71,23 @@ impl Plugin for AnimPlugin {
 }
 
 #[derive(Resource)]
-pub struct AnimConfig {
-    pub default_fps: f32,
+pub(crate) struct AnimConfig {
+    pub(crate) default_fps: f32,
 }
 
 #[derive(Component)]
 #[component(on_add = on_add_anim_man::<A>)]
-pub struct AnimMan<A: Anim> {
+pub(crate) struct AnimMan<A: Anim> {
     table: &'static [AnimVariant],
     variant_index: usize,
     loaded_variant_index: usize,
     frame: usize,
     timer: f32,
     fps_override: Option<f32>,
-    pub paused: bool,
-    pub visible: bool,
-    pub flip_x: bool,
-    pub flip_y: bool,
+    pub(crate) paused: bool,
+    pub(crate) visible: bool,
+    pub(crate) flip_x: bool,
+    pub(crate) flip_y: bool,
     _phantom: PhantomData<A>,
 }
 
@@ -295,6 +295,6 @@ fn tick_anim<A: Anim>(
     }
 }
 
-pub fn register_anim<A: Anim>(app: &mut App) {
+pub(crate) fn register_anim<A: Anim>(app: &mut App) {
     app.add_systems(Update, tick_anim::<A>);
 }

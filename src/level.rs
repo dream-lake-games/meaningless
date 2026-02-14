@@ -5,41 +5,42 @@ use bevy_ecs_ldtk::prelude::*;
 use crate::anim::AnimMan;
 use crate::animations::CellAnim;
 use crate::gol::{SpawnPosition, GHOST_ALPHA};
+use crate::menu::AppState;
 use crate::player::{spawn_player, Player};
 use crate::TILE_SIZE;
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
-pub struct LevelSystemSet;
+pub(crate) struct LevelSystemSet;
 
 #[derive(Component, Default)]
-pub struct PermanentCell;
+pub(crate) struct PermanentCell;
 
 #[derive(Component, Default)]
-pub struct DynamicCell;
+pub(crate) struct DynamicCell;
 
 #[derive(Component, Default)]
-pub struct NeverCell;
+pub(crate) struct NeverCell;
 
 #[derive(Component, Default)]
-pub struct PlayerSpawn;
+pub(crate) struct PlayerSpawn;
 
 #[derive(Bundle, LdtkIntCell, Default)]
-pub struct PermanentCellBundle {
+pub(crate) struct PermanentCellBundle {
     marker: PermanentCell,
 }
 
 #[derive(Bundle, LdtkIntCell, Default)]
-pub struct DynamicCellBundle {
+pub(crate) struct DynamicCellBundle {
     marker: DynamicCell,
 }
 
 #[derive(Bundle, LdtkIntCell, Default)]
-pub struct NeverCellBundle {
+pub(crate) struct NeverCellBundle {
     marker: NeverCell,
 }
 
 #[derive(Bundle, LdtkEntity, Default)]
-pub struct PlayerSpawnBundle {
+pub(crate) struct PlayerSpawnBundle {
     marker: PlayerSpawn,
 }
 
@@ -107,7 +108,7 @@ fn spawn_player_at_spawn_point(
     }
 }
 
-pub fn level_plugin_fn(app: &mut App) {
+pub(crate) fn level_plugin_fn(app: &mut App) {
     app.add_plugins(LdtkPlugin)
         .insert_resource(LevelSelection::index(0))
         .insert_resource(LdtkSettings {
@@ -119,7 +120,7 @@ pub fn level_plugin_fn(app: &mut App) {
         .register_ldtk_int_cell::<DynamicCellBundle>(2)
         .register_ldtk_int_cell::<NeverCellBundle>(3)
         .register_ldtk_entity::<PlayerSpawnBundle>("PlayerSpawn")
-        .add_systems(Startup, setup_level)
+        .add_systems(OnEnter(AppState::Playing), setup_level)
         .add_systems(
             Update,
             (
@@ -129,6 +130,7 @@ pub fn level_plugin_fn(app: &mut App) {
                 sync_never_cell_opacity,
             )
                 .chain()
-                .in_set(LevelSystemSet),
+                .in_set(LevelSystemSet)
+                .run_if(in_state(AppState::Playing)),
         );
 }

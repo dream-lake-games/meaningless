@@ -3,6 +3,7 @@ use bevy::prelude::*;
 
 use crate::anim::AnimMan;
 use crate::animations::PlayerAnim;
+use crate::menu::AppState;
 
 const HITBOX_WIDTH: f32 = 12.0;
 const HITBOX_HEIGHT: f32 = 14.0;
@@ -24,16 +25,16 @@ const JUMP_BUFFER_TIME: f32 = 0.16;
 const SKIN: f32 = 0.5;
 
 #[derive(Component)]
-pub struct Player;
+pub(crate) struct Player;
 
 #[derive(Component)]
-pub struct PlayerState {
-    pub vx: f32,
-    pub vy: f32,
-    pub grounded: bool,
-    pub was_grounded: bool,
-    pub facing_right: bool,
-    pub pushing_wall: bool,
+pub(crate) struct PlayerState {
+    pub(crate) vx: f32,
+    pub(crate) vy: f32,
+    pub(crate) grounded: bool,
+    pub(crate) was_grounded: bool,
+    pub(crate) facing_right: bool,
+    pub(crate) pushing_wall: bool,
     coyote_timer: f32,
     jump_buffer_timer: f32,
     jump_held: bool,
@@ -55,7 +56,7 @@ impl Default for PlayerState {
     }
 }
 
-pub fn spawn_player(commands: &mut Commands, pos: Vec2) {
+pub(crate) fn spawn_player(commands: &mut Commands, pos: Vec2) {
     commands.spawn((
         Name::new("Player"),
         Player,
@@ -258,6 +259,6 @@ fn move_toward(current: f32, target: f32, max_step: f32) -> f32 {
     }
 }
 
-pub fn player_plugin_fn(app: &mut App) {
-    app.add_systems(Update, player_system);
+pub(crate) fn player_plugin_fn(app: &mut App) {
+    app.add_systems(Update, player_system.run_if(in_state(AppState::Playing)));
 }

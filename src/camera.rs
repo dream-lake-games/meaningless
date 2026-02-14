@@ -7,18 +7,19 @@ use bevy::{
     },
 };
 
+use crate::menu::AppState;
 use crate::player::Player;
 use crate::{INTERNAL_SIZE, WINDOW_SIZE};
 
-pub const PIXEL_PERFECT_LAYERS: RenderLayers = RenderLayers::layer(0);
-pub const HIGH_RES_LAYERS: RenderLayers = RenderLayers::layer(1);
+pub(crate) const PIXEL_PERFECT_LAYERS: RenderLayers = RenderLayers::layer(0);
+pub(crate) const HIGH_RES_LAYERS: RenderLayers = RenderLayers::layer(1);
 
 const DEADZONE_X: f32 = 16.0;
 const DEADZONE_Y: f32 = 24.0;
 const CATCH_UP_SPEED: f32 = 8.0;
 
 #[derive(Component)]
-pub struct InGameCamera;
+pub(crate) struct InGameCamera;
 
 #[derive(Component)]
 struct OuterCamera;
@@ -121,9 +122,11 @@ fn camera_follow_system(
     camera_tf.translation.y = new_pos.y.round();
 }
 
-pub fn camera_plugin_fn(app: &mut App) {
+pub(crate) fn camera_plugin_fn(app: &mut App) {
     app.add_systems(Startup, spawn_cameras).add_systems(
         PostUpdate,
-        camera_follow_system.before(TransformSystems::Propagate),
+        camera_follow_system
+            .before(TransformSystems::Propagate)
+            .run_if(in_state(AppState::Playing)),
     );
 }
