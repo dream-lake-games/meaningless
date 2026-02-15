@@ -1,0 +1,4 @@
+[[anim]]
+name = "ControlsAnim"
+file = "assets/menu/controls.aseprite"
+default = "Arrow"

@@ -7,8 +7,10 @@ use crate::TILE_SIZE;
 use crate::anim::AnimMan;
 use crate::animations::CellAnim;
 use crate::level::{DynamicCell, LevelSystemSet, NeverCell, PermanentCell};
+use crate::menu::navigation::ControlScheme;
 use crate::menu::AppState;
 use crate::player::{Player, PlayerState};
+use crate::sign::DialogueState;
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct GolSystemSet;
@@ -194,16 +196,23 @@ fn init_from_ldtk(
 
 fn process_tick_input(
     keyboard: Res<ButtonInput<KeyCode>>,
+    controls: Res<ControlScheme>,
+    dialogue: Res<DialogueState>,
     mut tick_state: ResMut<TickState>,
     mut player_query: Query<(&mut Transform, &mut PlayerState), With<Player>>,
     mut respawn_timer: ResMut<RespawnTimer>,
 ) {
-    if !tick_state.initialized {
+    if !tick_state.initialized || dialogue.active {
         return;
     }
 
-    let forward = keyboard.just_pressed(KeyCode::KeyK);
-    let backward = keyboard.just_pressed(KeyCode::KeyL);
+    let (back_key, forward_key) = match *controls {
+        ControlScheme::Arrow => (KeyCode::KeyD, KeyCode::KeyF),
+        ControlScheme::Wasd => (KeyCode::KeyJ, KeyCode::KeyK),
+    };
+
+    let forward = keyboard.just_pressed(forward_key);
+    let backward = keyboard.just_pressed(back_key);
 
     if !forward && !backward {
         return;
@@ -462,6 +471,37 @@ fn handle_respawn(
 
 pub(crate) const GHOST_ALPHA: f32 = 0.5;
 
+fn cleanup_gol(
+    mut commands: Commands,
+    mut tick_state: ResMut<TickState>,
+    mut cell_entities: ResMut<CellEntities>,
+    mut respawn_timer: ResMut<RespawnTimer>,
+    mut level_entity: ResMut<LevelEntity>,
+    gol_cells: Query<Entity, With<GolCell>>,
+) {
+    info!(
+        "Cleaning up GoL: {} cells, {} entities in map",
+        gol_cells.iter().count(),
+        cell_entities.map.len()
+    );
+
+    for entity in &gol_cells {
+        commands.entity(entity).despawn();
+    }
+
+    tick_state.previous = None;
+    tick_state.current.clear();
+    tick_state.next.clear();
+    tick_state.permanent.clear();
+    tick_state.never.clear();
+    tick_state.history.clear();
+    tick_state.initialized = false;
+
+    cell_entities.map.clear();
+    respawn_timer.0 = None;
+    level_entity.0 = None;
+}
+
 fn sync_cell_opacity(
     cell_query: Query<(Option<&RigidBody>, &Children), With<GolCell>>,
     mut sprite_query: Query<&mut Sprite>,
@@ -482,6 +522,7 @@ pub(crate) fn gol_plugin_fn(app: &mut App) {
         .init_resource::<SpawnPosition>()
         .init_resource::<RespawnTimer>()
         .init_resource::<LevelEntity>()
+        .add_systems(OnExit(AppState::Playing), cleanup_gol)
         .add_systems(
             Update,
             (

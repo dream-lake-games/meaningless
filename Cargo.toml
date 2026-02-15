@@ -7,12 +7,19 @@ edition = "2024"
 bevy = "0.18"
 avian2d = "0.5"
 bevy_ecs_ldtk = "0.14"
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+rand = "0.10.0"
+
+[target.'cfg(target_family = "wasm")'.dependencies]
+web-sys = { version = "0.3", features = ["Window", "Storage"] }
 
 [build-dependencies]
 toml = "0.8"
 
 [target.'cfg(not(target_family = "wasm"))'.dependencies]
 bevy = { version = "0.18", features = ["file_watcher"] }
+dirs = "6.0"
 
 [profile.dev]
 opt-level = 0

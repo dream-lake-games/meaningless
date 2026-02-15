@@ -4,10 +4,12 @@ use bevy::prelude::*;
 use crate::anim::AnimMan;
 use crate::animations::PlayerAnim;
 use crate::menu::AppState;
+use crate::menu::navigation::ControlScheme;
+use crate::sign::DialogueState;
 
 const HITBOX_WIDTH: f32 = 12.0;
 const HITBOX_HEIGHT: f32 = 14.0;
-const HITBOX_OFFSET_Y: f32 = -1.0;
+const HITBOX_OFFSET_Y: f32 = -2.0;
 
 const MOVE_SPEED: f32 = 150.0;
 const GROUND_ACCEL: f32 = 4000.0;
@@ -73,18 +75,28 @@ fn player_system(
     keyboard: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     spatial: SpatialQuery,
+    controls: Res<ControlScheme>,
+    dialogue: Res<DialogueState>,
     mut query: Query<(&mut Transform, &mut PlayerState, &mut AnimMan<PlayerAnim>), With<Player>>,
 ) {
+    if dialogue.active {
+        return;
+    }
     let dt = time.delta_secs();
     let shape = Collider::rectangle(HITBOX_WIDTH - SKIN * 2.0, HITBOX_HEIGHT - SKIN * 2.0);
     let filter = SpatialQueryFilter::default();
 
+    let (left_key, right_key, jump_key) = match *controls {
+        ControlScheme::Arrow => (KeyCode::ArrowLeft, KeyCode::ArrowRight, KeyCode::ArrowUp),
+        ControlScheme::Wasd => (KeyCode::KeyA, KeyCode::KeyD, KeyCode::KeyW),
+    };
+
     for (mut tf, mut state, mut anim) in &mut query {
         let mut input_dir = 0.0;
-        if keyboard.pressed(KeyCode::KeyA) {
+        if keyboard.pressed(left_key) {
             input_dir -= 1.0;
         }
-        if keyboard.pressed(KeyCode::KeyD) {
+        if keyboard.pressed(right_key) {
             input_dir += 1.0;
         }
 
@@ -94,8 +106,8 @@ fn player_system(
             state.facing_right = false;
         }
 
-        state.jump_held = keyboard.pressed(KeyCode::KeyJ);
-        if keyboard.just_pressed(KeyCode::KeyJ) {
+        state.jump_held = keyboard.pressed(jump_key);
+        if keyboard.just_pressed(jump_key) {
             state.jump_buffer_timer = JUMP_BUFFER_TIME;
         }
         state.jump_buffer_timer -= dt;
@@ -208,8 +220,12 @@ fn player_system(
 
         let just_landed = state.grounded && !state.was_grounded;
         let current = anim.get();
-        let holding_down = keyboard.pressed(KeyCode::KeyS);
-        let holding_up = keyboard.pressed(KeyCode::KeyW);
+        let (down_key, up_key) = match *controls {
+            ControlScheme::Arrow => (KeyCode::ArrowDown, KeyCode::ArrowUp),
+            ControlScheme::Wasd => (KeyCode::KeyS, KeyCode::KeyW),
+        };
+        let holding_down = keyboard.pressed(down_key);
+        let holding_up = keyboard.pressed(up_key);
         let is_idle = state.vx.abs() < 5.0;
 
         let new_anim = if just_jumped {

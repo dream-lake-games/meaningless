@@ -7,6 +7,9 @@ use crate::camera::PIXEL_PERFECT_LAYERS;
 use crate::menu::AppState;
 use crate::palette;
 
+#[derive(Resource, Default)]
+struct PreviousLevelSelection(Option<usize>);
+
 const MENU_TILE_SIZE: f32 = 8.0;
 const MENU_LEVEL_SIZE: f32 = 320.0;
 const CELL_Z: f32 = 10.0;
@@ -235,24 +238,67 @@ fn grid_to_world(grid_pos: IVec2) -> Vec2 {
     )
 }
 
-fn cleanup_menu_state(mut state: ResMut<MenuCellState>, mut timer: ResMut<MenuTickTimer>) {
+fn handle_level_change(
+    mut state: ResMut<MenuCellState>,
+    mut timer: ResMut<MenuTickTimer>,
+    mut prev_level: ResMut<PreviousLevelSelection>,
+    level_selection: Res<LevelSelection>,
+) {
+    let current_index = match &*level_selection {
+        LevelSelection::Indices(indices) => Some(indices.level),
+        _ => None,
+    };
+
+    if prev_level.0 == current_index {
+        return;
+    }
+
+    info!(
+        "Level changed: {:?} -> {:?}, clearing {} dynamic cell references",
+        prev_level.0,
+        current_index,
+        state.entities.len()
+    );
+
+    state.permanent.clear();
+    state.current.clear();
+    state.entities.clear();
+    state.level_entity = None;
+    state.initialized = false;
+    timer.0.reset();
+
+    prev_level.0 = current_index;
+}
+
+fn cleanup_menu_state(
+    mut state: ResMut<MenuCellState>,
+    mut timer: ResMut<MenuTickTimer>,
+    mut prev_level: ResMut<PreviousLevelSelection>,
+) {
     state.permanent.clear();
     state.current.clear();
     state.entities.clear();
     state.initialized = false;
     timer.0.reset();
+    prev_level.0 = None;
 }
 
 pub(crate) fn cells_plugin_fn(app: &mut App) {
     app.init_resource::<MenuCellState>()
         .init_resource::<MenuTickTimer>()
+        .init_resource::<PreviousLevelSelection>()
         .register_ldtk_int_cell_for_layer::<MenuPermanentCellBundle>("Cells", 1)
         .register_ldtk_int_cell_for_layer::<MenuDynamicCellBundle>("Cells", 2)
         .add_systems(OnEnter(AppState::Menu), setup_menu_level)
         .add_systems(OnExit(AppState::Menu), cleanup_menu_state)
         .add_systems(
             Update,
-            (init_permanent_cells, init_dynamic_cells, tick_simulation)
+            (
+                handle_level_change,
+                init_permanent_cells,
+                init_dynamic_cells,
+                tick_simulation,
+            )
                 .chain()
                 .run_if(in_state(AppState::Menu)),
         );

@@ -1,5 +1,4 @@
 use bevy::prelude::*;
-use bevy::state::state_scoped::DespawnOnExit;
 use bevy_ecs_ldtk::prelude::*;
 
 use crate::camera::HIGH_RES_LAYERS;
@@ -12,6 +11,9 @@ const TEXT_Z: f32 = 100.0;
 
 #[derive(Component, Default)]
 struct MenuText;
+
+#[derive(Component)]
+struct SpawnedMenuText;
 
 #[derive(Component, Default, Reflect)]
 struct TextContent {
@@ -39,10 +41,40 @@ struct MenuTextBundle {
 #[derive(Resource, Default)]
 struct MenuTextState {
     font: Option<Handle<Font>>,
+    prev_level: Option<usize>,
 }
 
 fn setup_font(mut state: ResMut<MenuTextState>, asset_server: Res<AssetServer>) {
     state.font = Some(asset_server.load("fonts/Tiny5-Regular.ttf"));
+}
+
+fn handle_level_change(
+    mut commands: Commands,
+    mut state: ResMut<MenuTextState>,
+    level_selection: Res<LevelSelection>,
+    text_query: Query<Entity, With<SpawnedMenuText>>,
+) {
+    let current_level = match &*level_selection {
+        LevelSelection::Indices(indices) => Some(indices.level),
+        _ => None,
+    };
+
+    if state.prev_level == current_level {
+        return;
+    }
+
+    info!(
+        "Text: level changed {:?} -> {:?}, despawning {} text entities",
+        state.prev_level,
+        current_level,
+        text_query.iter().count()
+    );
+
+    for entity in &text_query {
+        commands.entity(entity).despawn();
+    }
+
+    state.prev_level = current_level;
 }
 
 fn spawn_text_entities(
@@ -61,6 +93,7 @@ fn spawn_text_entities(
         commands.entity(entity).despawn();
 
         commands.spawn((
+            SpawnedMenuText,
             Text2d::new(&content.text),
             TextFont {
                 font: font.clone(),
@@ -70,7 +103,6 @@ fn spawn_text_entities(
             TextColor(palette::BLACK),
             Transform::from_xyz(high_res_pos.x, high_res_pos.y, TEXT_Z),
             HIGH_RES_LAYERS,
-            DespawnOnExit::<AppState>::default(),
         ));
     }
 }
@@ -82,10 +114,27 @@ fn ldtk_to_highres(ldtk_pos: Vec2) -> Vec2 {
     Vec2::new(centered_x * 2.0, centered_y * 2.0)
 }
 
+fn cleanup_text(
+    mut commands: Commands,
+    mut state: ResMut<MenuTextState>,
+    text_query: Query<Entity, With<SpawnedMenuText>>,
+) {
+    for entity in &text_query {
+        commands.entity(entity).despawn();
+    }
+    state.prev_level = None;
+}
+
 pub(crate) fn text_plugin_fn(app: &mut App) {
     app.init_resource::<MenuTextState>()
         .register_type::<TextContent>()
         .register_ldtk_entity::<MenuTextBundle>("Text")
         .add_systems(OnEnter(AppState::Menu), setup_font)
-        .add_systems(Update, spawn_text_entities.run_if(in_state(AppState::Menu)));
+        .add_systems(OnExit(AppState::Menu), cleanup_text)
+        .add_systems(
+            Update,
+            (handle_level_change, spawn_text_entities)
+                .chain()
+                .run_if(in_state(AppState::Menu)),
+        );
 }

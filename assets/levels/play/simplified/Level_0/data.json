@@ -3,7 +3,7 @@
 	"uniqueIdentifer": "ad0d0030-fa90-11f0-83a2-2569b24e9a1f",
 	"x": -1,
 	"y": -1,
-	"width": 640,
+	"width": 768,
 	"height": 640,
 	"bgColor": "#696A79",
 	"neighbourLevels": [],
@@ -16,11 +16,28 @@
 				"iid": "1f33dee0-fa90-11f0-83a2-a99604405ac0",
 				"layer": "Entities",
 				"x": 160,
-				"y": 256,
+				"y": 320,
 				"width": 32,
 				"height": 32,
 				"color": 8978176,
 				"customFields" : {}
+			}
+		],
+		"Sign": [
+			{
+				"id": "Sign",
+				"iid": "8545f650-fa90-11f0-b242-dda89d1d4150",
+				"layer": "Entities",
+				"x": 224,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 0,
+				"customFields": {
+					"text": [
+						"Welcome to the game of"
+					]
+				}
 			}
 		]
 	}

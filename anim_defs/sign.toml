@@ -1,0 +1,4 @@
+[[anim]]
+name = "SignAnim"
+file = "assets/misc/sign.aseprite"
+default = "Idle"

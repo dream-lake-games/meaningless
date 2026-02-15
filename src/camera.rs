@@ -9,6 +9,7 @@ use bevy::{
 
 use crate::menu::AppState;
 use crate::player::Player;
+use crate::transition::TransitionState;
 use crate::{INTERNAL_SIZE, WINDOW_SIZE};
 
 pub(crate) const PIXEL_PERFECT_LAYERS: RenderLayers = RenderLayers::layer(0);
@@ -87,9 +88,14 @@ fn spawn_cameras(mut commands: Commands, mut images: ResMut<Assets<Image>>) {
 
 fn camera_follow_system(
     time: Res<Time>,
+    transition: Res<TransitionState>,
     player_q: Query<&Transform, (With<Player>, Without<InGameCamera>)>,
     mut camera_q: Query<&mut Transform, (With<InGameCamera>, Without<Player>)>,
 ) {
+    if transition.is_active() {
+        return;
+    }
+
     let Ok(player_tf) = player_q.single() else {
         return;
     };

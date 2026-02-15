@@ -42,6 +42,7 @@ struct AnimDef {
 struct VariantOverride {
     fps: Option<u32>,
     next: Option<String>,
+    no_stutter: bool,
 }
 
 #[derive(Debug)]
@@ -60,6 +61,7 @@ struct ProcessedVariant {
     frame_width: u32,
     frame_height: u32,
     asset_path: String,
+    no_stutter: bool,
 }
 
 #[derive(Debug, Clone)]
@@ -144,6 +146,7 @@ fn parse_toml(content: &str, path: &Path) -> Vec<AnimDef> {
                     VariantOverride {
                         fps: None,
                         next: next_value,
+                        no_stutter: false,
                     },
                 );
             }
@@ -160,6 +163,10 @@ fn parse_toml(content: &str, path: &Path) -> Vec<AnimDef> {
                     .get("next")
                     .and_then(|v| v.as_str())
                     .map(String::from);
+                let var_no_stutter = var_table
+                    .get("no_stutter")
+                    .and_then(|v| v.as_bool())
+                    .unwrap_or(false);
 
                 let existing = variants.get(var_name);
                 variants.insert(
@@ -167,6 +174,7 @@ fn parse_toml(content: &str, path: &Path) -> Vec<AnimDef> {
                     VariantOverride {
                         fps: var_fps.or(existing.and_then(|e| e.fps)),
                         next: var_next.or(existing.and_then(|e| e.next.clone())),
+                        no_stutter: var_no_stutter || existing.map(|e| e.no_stutter).unwrap_or(false),
                     },
                 );
             }
@@ -236,6 +244,7 @@ fn process_single_animation(def: &AnimDef, toml_content: &str) -> ProcessedAnim 
 
         let override_info = def.variants.get(&variant_name);
         let fps = override_info.and_then(|o| o.fps).or(def.fps);
+        let no_stutter = override_info.map(|o| o.no_stutter).unwrap_or(false);
 
         let next = if let Some(next_str) = override_info.and_then(|o| o.next.as_ref()) {
             match next_str.as_str() {
@@ -267,6 +276,7 @@ fn process_single_animation(def: &AnimDef, toml_content: &str) -> ProcessedAnim 
             frame_width: export.frame_width,
             frame_height: export.frame_height,
             asset_path: export.asset_path.clone(),
+            no_stutter,
         });
     }
 
@@ -350,8 +360,9 @@ fn generate_single_anim(anim: &ProcessedAnim) -> String {
         frame_size: ({}, {}),
         asset_path: "{}",
         next: {},
+        no_stutter: {},
     }}"#,
-                v.tag, fps_str, v.frame_count, v.frame_width, v.frame_height, v.asset_path, next_str
+                v.tag, fps_str, v.frame_count, v.frame_width, v.frame_height, v.asset_path, next_str, v.no_stutter
             )
         })
         .collect();

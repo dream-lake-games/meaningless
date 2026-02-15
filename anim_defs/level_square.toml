@@ -1,0 +1,4 @@
+[[anim]]
+name = "LevelSquareAnim"
+file = "assets/menu/level_square.aseprite"
+default = "Locked"

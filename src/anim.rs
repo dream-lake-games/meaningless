@@ -4,7 +4,10 @@ use bevy::{
     ecs::{lifecycle::HookContext, world::DeferredWorld},
     prelude::*,
 };
+use rand::RngExt;
 use std::marker::PhantomData;
+
+const STUTTER_AMOUNT: f32 = 0.15;
 
 #[derive(Component)]
 pub(crate) struct AnimSprite<A: Anim> {
@@ -34,6 +37,7 @@ pub(crate) struct AnimVariant {
     pub(crate) frame_size: (u32, u32),
     pub(crate) asset_path: &'static str,
     pub(crate) next: AnimNextIndex,
+    pub(crate) no_stutter: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -55,7 +59,7 @@ pub(crate) struct AnimPlugin {
 
 impl Default for AnimPlugin {
     fn default() -> Self {
-        Self { default_fps: 8.0 }
+        Self { default_fps: 4.0 }
     }
 }
 
@@ -83,12 +87,17 @@ pub(crate) struct AnimMan<A: Anim> {
     loaded_variant_index: usize,
     frame: usize,
     timer: f32,
+    stutter: f32,
     fps_override: Option<f32>,
     pub(crate) paused: bool,
     pub(crate) visible: bool,
     pub(crate) flip_x: bool,
     pub(crate) flip_y: bool,
     _phantom: PhantomData<A>,
+}
+
+fn random_stutter() -> f32 {
+    rand::rng().random_range(-STUTTER_AMOUNT..STUTTER_AMOUNT)
 }
 
 impl<A: Anim> AnimMan<A> {
@@ -100,6 +109,7 @@ impl<A: Anim> AnimMan<A> {
             loaded_variant_index: index,
             frame: 0,
             timer: 0.0,
+            stutter: random_stutter(),
             fps_override: None,
             paused: false,
             visible: true,
@@ -260,13 +270,22 @@ fn tick_anim<A: Anim>(
             .fps_override
             .or(variant.fps)
             .unwrap_or(config.default_fps);
-        let frame_duration = 1.0 / fps;
+        let no_stutter = variant.no_stutter;
+        let base_frame_duration = 1.0 / fps;
+        let frame_duration = if no_stutter {
+            base_frame_duration
+        } else {
+            base_frame_duration * (1.0 + state.stutter)
+        };
 
         state.timer += time.delta_secs();
 
         while state.timer >= frame_duration {
             state.timer -= frame_duration;
             state.frame += 1;
+            if !no_stutter {
+                state.stutter = random_stutter();
+            }
 
             let variant = state.current();
             if state.frame >= variant.frame_count {
