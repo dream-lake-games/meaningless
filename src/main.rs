@@ -15,7 +15,6 @@ pub(crate) mod palette;
 mod player;
 pub(crate) mod sfx;
 mod sign;
-mod spiral;
 mod transition;
 
 pub(crate) const INTERNAL_SIZE: u32 = 320;

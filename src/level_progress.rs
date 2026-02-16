@@ -162,7 +162,6 @@ fn save_progress_on_change(progress: Res<LevelProgress>, mut last_saved: ResMut<
         };
         save_to_disk(&data);
         last_saved.0 = current_count;
-        info!("Saved progress: {} levels completed", current_count);
     }
 }
 

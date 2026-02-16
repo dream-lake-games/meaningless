@@ -77,7 +77,6 @@ fn select_level_from_progress(
     mut level_selection: ResMut<LevelSelection>,
 ) {
     let level = progress.current_playing.unwrap_or(0);
-    info!("Setting LevelSelection to level {}", level);
     *level_selection = LevelSelection::index(level);
 }
 

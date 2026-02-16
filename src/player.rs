@@ -75,8 +75,6 @@ pub(crate) fn spawn_player(commands: &mut Commands, pos: Vec2) {
         Visibility::Inherited,
         PlayerState::default(),
     ));
-
-    info!("Player spawned at ({}, {})", pos.x, pos.y);
 }
 
 fn player_system(

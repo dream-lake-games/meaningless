@@ -1,2 +1,5 @@
 /target
 .cursor
+/dist
+*.zip
+.DS_Store
