@@ -3,4 +3,4 @@ name = "PlayerAnim"
 file = "assets/player/player.aseprite"
 default = "Idle"
 fps = 8
-next = { Jump = "AirStill", Land = "Idle" }
+next = { Jump = "AirStill", Land = "Idle", Die = "None" }

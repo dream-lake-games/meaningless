@@ -10,7 +10,6 @@ use crate::menu::AppState;
 struct ControlsSpriteMarker;
 
 fn spawn_controls_sprite(mut commands: Commands) {
-    info!("Spawning controls sprite");
     commands.spawn((
         ControlsSpriteMarker,
         AnimMan::new(ControlsAnim::Arrow),

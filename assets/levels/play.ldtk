@@ -11,7 +11,7 @@
 	"iid": "ad0cd920-fa90-11f0-83a2-b34ddba0e68d",
 	"jsonVersion": "1.5.3",
 	"appBuildId": 473703,
-	"nextUid": 12,
+	"nextUid": 16,
 	"identifierStyle": "Capitalize",
 	"toc": [],
 	"worldLayout": "LinearHorizontal",
@@ -68,6 +68,41 @@
 			"uiFilterTags": [],
 			"useAsyncRender": false,
 			"intGridValues": [],
+			"intGridValuesGroups": [],
+			"autoRuleGroups": [],
+			"autoSourceLayerDefUid": null,
+			"tilesetDefUid": null,
+			"tilePivotX": 0,
+			"tilePivotY": 0,
+			"biomeFieldUid": null
+		},
+		{
+			"__type": "IntGrid",
+			"identifier": "Spikes",
+			"type": "IntGrid",
+			"uid": 15,
+			"doc": null,
+			"uiColor": null,
+			"gridSize": 32,
+			"guideGridWid": 0,
+			"guideGridHei": 0,
+			"displayOpacity": 1,
+			"inactiveOpacity": 1,
+			"hideInList": false,
+			"hideFieldsWhenInactive": false,
+			"canSelectWhenInactive": true,
+			"renderInWorldView": true,
+			"pxOffsetX": 0,
+			"pxOffsetY": 0,
+			"parallaxFactorX": 0,
+			"parallaxFactorY": 0,
+			"parallaxScaling": true,
+			"requiredTags": [],
+			"excludedTags": [],
+			"autoTilesKilledByOtherLayerUid": null,
+			"uiFilterTags": [],
+			"useAsyncRender": false,
+			"intGridValues": [{ "value": 1, "identifier": "Spikes", "color": "#000000", "tile": null, "groupUid": 0 }],
 			"intGridValuesGroups": [],
 			"autoRuleGroups": [],
 			"autoSourceLayerDefUid": null,
@@ -171,7 +206,7 @@
 			"fillOpacity": 1,
 			"lineOpacity": 1,
 			"hollow": false,
-			"color": "#000000",
+			"color": "#B66DFF",
 			"renderMode": "Rectangle",
 			"showName": true,
 			"tilesetId": null,
@@ -223,6 +258,41 @@
 					"tilesetUid": null
 				}
 			]
+		},
+		{
+			"identifier": "Flag",
+			"uid": 12,
+			"tags": [],
+			"exportToToc": false,
+			"allowOutOfBounds": false,
+			"doc": null,
+			"width": 32,
+			"height": 32,
+			"resizableX": false,
+			"resizableY": false,
+			"minWidth": null,
+			"maxWidth": null,
+			"minHeight": null,
+			"maxHeight": null,
+			"keepAspectRatio": false,
+			"tileOpacity": 1,
+			"fillOpacity": 1,
+			"lineOpacity": 1,
+			"hollow": false,
+			"color": "#920000",
+			"renderMode": "Rectangle",
+			"showName": true,
+			"tilesetId": null,
+			"tileRenderMode": "FitInside",
+			"tileRect": null,
+			"uiTileRect": null,
+			"nineSliceBorders": [],
+			"maxCount": 0,
+			"limitScope": "PerLevel",
+			"limitBehavior": "MoveLastOne",
+			"pivotX": 0,
+			"pivotY": 0,
+			"fieldDefs": []
 		}
 	], "tilesets": [
 		{
@@ -247,7 +317,45 @@
 				"averageColors": "fedefedefedefedefedefedefedefedefeddfeddfedefedefedefedefedefeddfeddfeddfecdfeddfedefedefedefedefedefedefedefcabfc9bfcabfedefedefedefedefeddfedefedefc9bfb9afc9bfedefedefedefedefeddfcabfb9afcabfc9bfcabfdbcfdbcfedefedefecdfcabfdcdfecdfdcdfedefdbcfdbcfdcdfdbcfdbcfcbbfdcdfeddfecdfedefeddfeddfdccfeddfeddfcabfdcdfecdfdcdfedefeddfeddfdccfdbcfdccfedefdbcfecdfecdfede"
 			}
 		}
-	], "enums": [], "externalEnums": [], "levelFields": [] },
+	], "enums": [], "externalEnums": [], "levelFields": [
+		{
+			"identifier": "Name",
+			"doc": null,
+			"__type": "String",
+			"uid": 13,
+			"type": "F_String",
+			"isArray": false,
+			"canBeNull": false,
+			"arrayMinLength": null,
+			"arrayMaxLength": null,
+			"editorDisplayMode": "NameAndValue",
+			"editorDisplayScale": 1,
+			"editorDisplayPos": "Above",
+			"editorLinkStyle": "StraightArrow",
+			"editorDisplayColor": null,
+			"editorAlwaysShow": false,
+			"editorShowInWorld": true,
+			"editorCutLongValues": true,
+			"editorTextSuffix": null,
+			"editorTextPrefix": null,
+			"useForSmartColor": false,
+			"exportToToc": false,
+			"searchable": false,
+			"min": null,
+			"max": null,
+			"regex": null,
+			"acceptFileTypes": null,
+			"defaultOverride": null,
+			"textLanguageMode": null,
+			"symmetricalRef": false,
+			"autoChainRef": true,
+			"allowOutOfLevelRef": true,
+			"allowedRefs": "OnlySame",
+			"allowedRefsEntityUid": null,
+			"allowedRefTags": [],
+			"tilesetUid": null
+		}
+	] },
 	"levels": [
 		{
 			"identifier": "Level_0",
@@ -256,7 +364,7 @@
 			"worldX": -1,
 			"worldY": -1,
 			"worldDepth": 0,
-			"pxWid": 768,
+			"pxWid": 1280,
 			"pxHei": 640,
 			"__bgColor": "#696A79",
 			"bgColor": null,
@@ -268,12 +376,15 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Name", "__type": "String", "__value": "Intro", "__tile": null, "defUid": 13, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Intro"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
 					"__type": "Entities",
-					"__cWid": 24,
+					"__cWid": 40,
 					"__cHei": 20,
 					"__gridSize": 32,
 					"__opacity": 1,
@@ -314,23 +425,222 @@
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
-							"__smartColor": "#000000",
+							"__smartColor": "#B66DFF",
 							"iid": "8545f650-fa90-11f0-b242-dda89d1d4150",
 							"width": 32,
 							"height": 32,
 							"defUid": 9,
 							"px": [224,320],
-							"fieldInstances": [{ "__identifier": "text", "__type": "Array<String>", "__value": ["Welcome to the game of"], "__tile": null, "defUid": 11, "realEditorValues": [{
+							"fieldInstances": [{ "__identifier": "text", "__type": "Array<String>", "__value": [
+								"Welcome to the game of MEANINGLESS EXISTENCE!",
+								"In this world, everything lives and dies. Including you!",
+								"This is what Bog decided would be fun."
+							], "__tile": null, "defUid": 11, "realEditorValues": [ {
 								"id": "V_String",
-								"params": ["Welcome to the game of"]
-							}] }]
+								"params": ["Welcome to the game of MEANINGLESS EXISTENCE!"]
+							}, {
+								"id": "V_String",
+								"params": ["In this world, everything lives and dies. Including you!"]
+							}, {
+								"id": "V_String",
+								"params": ["This is what Bog decided would be fun."]
+							} ] }]
+						},
+						{
+							"__identifier": "Sign",
+							"__grid": [14,10],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#B66DFF",
+							"iid": "d7475490-fa90-11f0-b242-49ac54c29bb9",
+							"width": 32,
+							"height": 32,
+							"defUid": 9,
+							"px": [448,320],
+							"fieldInstances": [{ "__identifier": "text", "__type": "Array<String>", "__value": [
+								"Cells with the lock will ALWAYS live.",
+								"Cells with the X will NEVER live.",
+								"You are some other life form that came to Bog in a dream."
+							], "__tile": null, "defUid": 11, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["Cells with the lock will ALWAYS live."]
+							}, {
+								"id": "V_String",
+								"params": ["Cells with the X will NEVER live."]
+							}, {
+								"id": "V_String",
+								"params": ["You are some other life form that came to Bog in a dream."]
+							} ] }]
+						},
+						{
+							"__identifier": "Sign",
+							"__grid": [28,10],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#B66DFF",
+							"iid": "6b2b4900-fa90-11f0-b242-4bcabc16e16d",
+							"width": 32,
+							"height": 32,
+							"defUid": 9,
+							"px": [896,320],
+							"fieldInstances": [{ "__identifier": "text", "__type": "Array<String>", "__value": [
+								"All other cells follow simple rules that Bog found online:",
+								"Any live cell with fewer than two neighbors dies from loneliness.",
+								"Any live cell with two or three neighbors lives and makes casual small-talk.",
+								"Any live cell with more than three neighbors dies from lack of personal space.",
+								"Any dead cell with exactly three live neighbors is born.",
+								"(Cells are born without their permission.)"
+							], "__tile": null, "defUid": 11, "realEditorValues": [
+								{
+									"id": "V_String",
+									"params": ["All other cells follow simple rules that Bog found online:"]
+								},
+								{
+									"id": "V_String",
+									"params": ["Any live cell with fewer than two neighbors dies from loneliness."]
+								},
+								{
+									"id": "V_String",
+									"params": ["Any live cell with two or three neighbors lives and makes casual small-talk."]
+								},
+								{
+									"id": "V_String",
+									"params": ["Any live cell with more than three neighbors dies from lack of personal space."]
+								},
+								{
+									"id": "V_String",
+									"params": ["Any dead cell with exactly three live neighbors is born."]
+								},
+								{
+									"id": "V_String",
+									"params": ["(Cells are born without their permission.)"]
+								}
+							] }]
+						},
+						{
+							"__identifier": "Sign",
+							"__grid": [21,10],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#B66DFF",
+							"iid": "94b9d000-fa90-11f0-b242-db4b1d05f60f",
+							"width": 32,
+							"height": 32,
+							"defUid": 9,
+							"px": [672,320],
+							"fieldInstances": [{ "__identifier": "text", "__type": "Array<String>", "__value": [
+								"Bog is taking a nap after working manically for just over a week on some silly game.",
+								"In his absence, Bog has given you control over time and the lives of these cells.",
+								"With arrows keys, use F to tick time forward and D to tick time backward.",
+								"With WASD, use K to tick time forward, and J to tick time backward."
+							], "__tile": null, "defUid": 11, "realEditorValues": [ {
+								"id": "V_String",
+								"params": [
+									"Bog is taking a nap after working manically for just over a week on some silly game."
+								]
+							}, {
+								"id": "V_String",
+								"params": ["In his absence, Bog has given you control over time and the lives of these cells."]
+							}, {
+								"id": "V_String",
+								"params": ["With arrows keys, use F to tick time forward and D to tick time backward."]
+							}, {
+								"id": "V_String",
+								"params": ["With WASD, use K to tick time forward, and J to tick time backward."]
+							} ] }]
+						},
+						{
+							"__identifier": "Flag",
+							"__grid": [37,10],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#920000",
+							"iid": "09212170-fa90-11f0-b242-b70353416aff",
+							"width": 32,
+							"height": 32,
+							"defUid": 12,
+							"px": [1184,320],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "Sign",
+							"__grid": [35,10],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#B66DFF",
+							"iid": "0abe56b0-fa90-11f0-b242-fdc2eab56e4a",
+							"width": 32,
+							"height": 32,
+							"defUid": 9,
+							"px": [1120,320],
+							"fieldInstances": [{ "__identifier": "text", "__type": "Array<String>", "__value": [ "That's enough reading for now.", "Look! Goal!" ], "__tile": null, "defUid": 11, "realEditorValues": [ {
+								"id": "V_String",
+								"params": ["That's enough reading for now."]
+							}, {
+								"id": "V_String",
+								"params": ["Look! Goal!"]
+							} ] }]
 						}
 					]
 				},
 				{
+					"__identifier": "Spikes",
+					"__type": "IntGrid",
+					"__cWid": 40,
+					"__cHei": 20,
+					"__gridSize": 32,
+					"__opacity": 1,
+					"__pxTotalOffsetX": 0,
+					"__pxTotalOffsetY": 0,
+					"__tilesetDefUid": null,
+					"__tilesetRelPath": null,
+					"iid": "b51a4250-fa90-11f0-9d09-3d1299096012",
+					"levelId": 0,
+					"layerDefUid": 15,
+					"pxOffsetX": 0,
+					"pxOffsetY": 0,
+					"visible": true,
+					"optionalRules": [],
+					"intGridCsv": [
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+					],
+					"autoLayerTiles": [],
+					"seed": 4561687,
+					"overrideTilesetUid": null,
+					"gridTiles": [],
+					"entityInstances": []
+				},
+				{
 					"__identifier": "Cell",
 					"__type": "IntGrid",
-					"__cWid": 24,
+					"__cWid": 40,
 					"__cHei": 20,
 					"__gridSize": 32,
 					"__opacity": 1,
@@ -351,15 +661,24 @@
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,2,0,2,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,2,2,2,0,0,0,0,0,0,2,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,0,0,0,0,0,
+						2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,
+						3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,3,1,1,1,1,1,1,3,1,1,1,1,
+						1,1,3,1,1,1,1,1,1,3,1,1,1,1,1,1,3,1,1,1,1,1,1,3,0,0,0,0,3,3,3,3,3,3,3,
+						3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,
-						3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,1,1,1,1,1,3,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,3,3,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
-						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 					],
 					"autoLayerTiles": [],
 					"seed": 2575920,
@@ -377,7 +696,7 @@
 			"worldX": -1,
 			"worldY": -1,
 			"worldDepth": 0,
-			"pxWid": 800,
+			"pxWid": 1280,
 			"pxHei": 736,
 			"__bgColor": "#696A79",
 			"bgColor": null,
@@ -389,12 +708,15 @@
 			"__smartColor": "#ADADB5",
 			"__bgPos": null,
 			"externalRelPath": null,
-			"fieldInstances": [],
+			"fieldInstances": [{ "__identifier": "Name", "__type": "String", "__value": "Unstable Bridge", "__tile": null, "defUid": 13, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Unstable Bridge"]
+			}] }],
 			"layerInstances": [
 				{
 					"__identifier": "Entities",
 					"__type": "Entities",
-					"__cWid": 25,
+					"__cWid": 40,
 					"__cHei": 23,
 					"__gridSize": 32,
 					"__opacity": 1,
@@ -414,12 +736,94 @@
 					"seed": 8433903,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
+					"entityInstances": [
+						{
+							"__identifier": "Flag",
+							"__grid": [32,11],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#920000",
+							"iid": "b018b3c0-fa90-11f0-b242-570c4bf4cbd8",
+							"width": 32,
+							"height": 32,
+							"defUid": 12,
+							"px": [1024,352],
+							"fieldInstances": []
+						},
+						{
+							"__identifier": "PlayerSpawn",
+							"__grid": [3,11],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#88FF00",
+							"iid": "b35e68e0-fa90-11f0-b242-55c07b04067a",
+							"width": 32,
+							"height": 32,
+							"defUid": 3,
+							"px": [96,352],
+							"fieldInstances": []
+						}
+					]
+				},
+				{
+					"__identifier": "Spikes",
+					"__type": "IntGrid",
+					"__cWid": 40,
+					"__cHei": 23,
+					"__gridSize": 32,
+					"__opacity": 1,
+					"__pxTotalOffsetX": 0,
+					"__pxTotalOffsetY": 0,
+					"__tilesetDefUid": null,
+					"__tilesetRelPath": null,
+					"iid": "b51a6960-fa90-11f0-9d09-095c1b7316eb",
+					"levelId": 5,
+					"layerDefUid": 15,
+					"pxOffsetX": 0,
+					"pxOffsetY": 0,
+					"visible": true,
+					"optionalRules": [],
+					"intGridCsv": [
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0
+					],
+					"autoLayerTiles": [],
+					"seed": 6034676,
+					"overrideTilesetUid": null,
+					"gridTiles": [],
 					"entityInstances": []
 				},
 				{
 					"__identifier": "Cell",
 					"__type": "IntGrid",
-					"__cWid": 25,
+					"__cWid": 40,
 					"__cHei": 23,
 					"__gridSize": 32,
 					"__opacity": 1,
@@ -447,6 +851,121 @@
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,3,3,3,3,3,0,0,0,0,0,2,0,0,
+						0,0,0,0,0,0,2,0,0,0,0,0,0,3,3,3,3,3,3,0,0,0,0,0,0,0,3,1,1,1,1,3,2,2,2,
+						0,0,2,0,0,2,2,2,0,0,0,2,0,0,0,2,2,2,3,1,1,1,1,3,0,0,0,0,0,0,0,3,3,3,3,
+						3,3,0,0,0,0,0,2,0,0,0,0,0,0,0,0,2,0,0,0,0,0,0,3,3,3,3,3,3,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0
+					],
+					"autoLayerTiles": [],
+					"seed": 8588055,
+					"overrideTilesetUid": null,
+					"gridTiles": [],
+					"entityInstances": []
+				}
+			],
+			"__neighbours": []
+		},
+		{
+			"identifier": "Level_2",
+			"iid": "ba1ea950-fa90-11f0-b242-cfd4dbb89f52",
+			"uid": 14,
+			"worldX": -1,
+			"worldY": -1,
+			"worldDepth": 0,
+			"pxWid": 640,
+			"pxHei": 640,
+			"__bgColor": "#696A79",
+			"bgColor": null,
+			"useAutoIdentifier": true,
+			"bgRelPath": null,
+			"bgPos": null,
+			"bgPivotX": 0.5,
+			"bgPivotY": 0.5,
+			"__smartColor": "#ADADB5",
+			"__bgPos": null,
+			"externalRelPath": null,
+			"fieldInstances": [{ "__identifier": "Name", "__type": "String", "__value": "Quicksand", "__tile": null, "defUid": 13, "realEditorValues": [{
+				"id": "V_String",
+				"params": ["Quicksand"]
+			}] }],
+			"layerInstances": [
+				{
+					"__identifier": "Entities",
+					"__type": "Entities",
+					"__cWid": 20,
+					"__cHei": 20,
+					"__gridSize": 32,
+					"__opacity": 1,
+					"__pxTotalOffsetX": 0,
+					"__pxTotalOffsetY": 0,
+					"__tilesetDefUid": null,
+					"__tilesetRelPath": null,
+					"iid": "ba1ed060-fa90-11f0-b242-1971d9cd8386",
+					"levelId": 14,
+					"layerDefUid": 4,
+					"pxOffsetX": 0,
+					"pxOffsetY": 0,
+					"visible": true,
+					"optionalRules": [],
+					"intGridCsv": [],
+					"autoLayerTiles": [],
+					"seed": 204569,
+					"overrideTilesetUid": null,
+					"gridTiles": [],
+					"entityInstances": [
+						{
+							"__identifier": "PlayerSpawn",
+							"__grid": [9,4],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#88FF00",
+							"iid": "d056ae20-fa90-11f0-b242-654ca2edfdd9",
+							"width": 32,
+							"height": 32,
+							"defUid": 3,
+							"px": [288,128],
+							"fieldInstances": []
+						}
+					]
+				},
+				{
+					"__identifier": "Spikes",
+					"__type": "IntGrid",
+					"__cWid": 20,
+					"__cHei": 20,
+					"__gridSize": 32,
+					"__opacity": 1,
+					"__pxTotalOffsetX": 0,
+					"__pxTotalOffsetY": 0,
+					"__tilesetDefUid": null,
+					"__tilesetRelPath": null,
+					"iid": "b51a9070-fa90-11f0-9d09-4f44e58b0cca",
+					"levelId": 14,
+					"layerDefUid": 15,
+					"pxOffsetX": 0,
+					"pxOffsetY": 0,
+					"visible": true,
+					"optionalRules": [],
+					"intGridCsv": [
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -454,7 +973,45 @@
 						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
 					],
 					"autoLayerTiles": [],
-					"seed": 8588055,
+					"seed": 3720454,
+					"overrideTilesetUid": null,
+					"gridTiles": [],
+					"entityInstances": []
+				},
+				{
+					"__identifier": "Cell",
+					"__type": "IntGrid",
+					"__cWid": 20,
+					"__cHei": 20,
+					"__gridSize": 32,
+					"__opacity": 1,
+					"__pxTotalOffsetX": 0,
+					"__pxTotalOffsetY": 0,
+					"__tilesetDefUid": null,
+					"__tilesetRelPath": null,
+					"iid": "ba1ed061-fa90-11f0-b242-f5cd5c95a3ac",
+					"levelId": 14,
+					"layerDefUid": 1,
+					"pxOffsetX": 0,
+					"pxOffsetY": 0,
+					"visible": true,
+					"optionalRules": [],
+					"intGridCsv": [
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,
+						2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,
+						0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,
+						0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,
+						2,2,2,2,2,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,2,
+						2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,
+						0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,
+						0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,
+						2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,
+						0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+					],
+					"autoLayerTiles": [],
+					"seed": 3489295,
 					"overrideTilesetUid": null,
 					"gridTiles": [],
 					"entityInstances": []

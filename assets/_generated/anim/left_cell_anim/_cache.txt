@@ -1,0 +1,11 @@
+none,1,48,48
+locked,3,48,48
+never,12,48,48
+stable,1,48,48
+yy,3,48,48
+yn,3,48,48
+ny,3,48,48
+scared,1,48,48
+pending,1,48,48
+slain,1,48,48
+spikes,3,48,48

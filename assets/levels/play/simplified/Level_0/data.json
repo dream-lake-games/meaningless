@@ -3,11 +3,13 @@
 	"uniqueIdentifer": "ad0d0030-fa90-11f0-83a2-2569b24e9a1f",
 	"x": -1,
 	"y": -1,
-	"width": 768,
+	"width": 1280,
 	"height": 640,
 	"bgColor": "#696A79",
 	"neighbourLevels": [],
-	"customFields" : {},
+	"customFields": {
+		"Name": "Intro"
+	},
 	"layers": [],
 	"entities": {
 		"PlayerSpawn": [
@@ -32,12 +34,98 @@
 				"y": 320,
 				"width": 32,
 				"height": 32,
-				"color": 0,
+				"color": 11955711,
 				"customFields": {
 					"text": [
-						"Welcome to the game of"
+						"Welcome to the game of MEANINGLESS EXISTENCE!",
+						"In this world, everything lives and dies. Including you!",
+						"This is what Bog decided would be fun."
 					]
 				}
+			},
+			{
+				"id": "Sign",
+				"iid": "d7475490-fa90-11f0-b242-49ac54c29bb9",
+				"layer": "Entities",
+				"x": 448,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"Cells with the lock will ALWAYS live.",
+						"Cells with the X will NEVER live.",
+						"You are some other life form that came to Bog in a dream."
+					]
+				}
+			},
+			{
+				"id": "Sign",
+				"iid": "6b2b4900-fa90-11f0-b242-4bcabc16e16d",
+				"layer": "Entities",
+				"x": 896,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"All other cells follow simple rules that Bog found online:",
+						"Any live cell with fewer than two neighbors dies from loneliness.",
+						"Any live cell with two or three neighbors lives and makes casual small-talk.",
+						"Any live cell with more than three neighbors dies from lack of personal space.",
+						"Any dead cell with exactly three live neighbors is born.",
+						"(Cells are born without their permission.)"
+					]
+				}
+			},
+			{
+				"id": "Sign",
+				"iid": "94b9d000-fa90-11f0-b242-db4b1d05f60f",
+				"layer": "Entities",
+				"x": 672,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"Bog is taking a nap after working manically for just over a week on some silly game.",
+						"In his absence, Bog has given you control over time and the lives of these cells.",
+						"With arrows keys, use F to tick time forward and D to tick time backward.",
+						"With WASD, use K to tick time forward, and J to tick time backward."
+					]
+				}
+			},
+			{
+				"id": "Sign",
+				"iid": "0abe56b0-fa90-11f0-b242-fdc2eab56e4a",
+				"layer": "Entities",
+				"x": 1120,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"That's enough reading for now.",
+						"Look! Goal!"
+					]
+				}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "09212170-fa90-11f0-b242-b70353416aff",
+				"layer": "Entities",
+				"x": 1184,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
 			}
 		]
 	}

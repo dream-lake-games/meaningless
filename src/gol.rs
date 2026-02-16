@@ -5,10 +5,10 @@ use std::collections::{HashMap, HashSet};
 
 use crate::TILE_SIZE;
 use crate::anim::AnimMan;
-use crate::animations::CellAnim;
-use crate::level::{DynamicCell, LevelSystemSet, NeverCell, PermanentCell};
-use crate::menu::navigation::ControlScheme;
+use crate::animations::{LeftCellAnim, PlayerAnim, RightCellAnim};
+use crate::level::{DynamicCell, LevelSystemSet, NeverCell, PermanentCell, Spike};
 use crate::menu::AppState;
+use crate::menu::navigation::ControlScheme;
 use crate::player::{Player, PlayerState};
 use crate::sign::DialogueState;
 
@@ -93,21 +93,44 @@ impl TickState {
         positions
     }
 
-    fn cell_state(&self, pos: IVec2) -> Option<CellAnim> {
+    fn cell_should_exist(&self, pos: IVec2) -> bool {
         let in_current = self.current.contains(&pos);
         let in_next = self.next.contains(&pos);
         let in_previous = self.previous.as_ref().is_some_and(|p| p.contains(&pos));
+        in_current || in_next || (in_previous && !in_current)
+    }
 
-        if in_current && in_next {
-            Some(CellAnim::Stable)
-        } else if in_current && !in_next {
-            Some(CellAnim::Scared)
-        } else if !in_current && in_next {
-            Some(CellAnim::Pending)
-        } else if in_previous && !in_current {
-            Some(CellAnim::Slain)
-        } else {
-            None
+    fn left_state(&self, pos: IVec2) -> LeftCellAnim {
+        let in_current = self.current.contains(&pos);
+
+        // If no history exists, treat current cells as stable
+        let Some(prev) = &self.previous else {
+            return if in_current {
+                LeftCellAnim::Yy
+            } else {
+                LeftCellAnim::None
+            };
+        };
+
+        let in_previous = prev.contains(&pos);
+
+        match (in_previous, in_current) {
+            (true, true) => LeftCellAnim::Yy,
+            (true, false) => LeftCellAnim::Ny,
+            (false, true) => LeftCellAnim::Yn,
+            (false, false) => LeftCellAnim::None,
+        }
+    }
+
+    fn right_state(&self, pos: IVec2) -> RightCellAnim {
+        let in_current = self.current.contains(&pos);
+        let in_next = self.next.contains(&pos);
+
+        match (in_current, in_next) {
+            (true, true) => RightCellAnim::Yy,
+            (true, false) => RightCellAnim::Yn,
+            (false, true) => RightCellAnim::Ny,
+            (false, false) => RightCellAnim::None,
         }
     }
 }
@@ -120,8 +143,22 @@ pub(crate) struct CellEntities {
 #[derive(Resource, Default)]
 pub(crate) struct SpawnPosition(pub(crate) Option<Vec2>);
 
+#[derive(PartialEq, Eq, Clone, Copy, Default)]
+pub(crate) enum DeathPhase {
+    #[default]
+    None,
+    Dying,
+    Rewinding,
+}
+
 #[derive(Resource, Default)]
-pub(crate) struct RespawnTimer(pub(crate) Option<Timer>);
+pub(crate) struct DeathRewind {
+    pub(crate) phase: DeathPhase,
+    pub(crate) timer: f32,
+}
+
+const REWIND_STEP_DURATION: f32 = 0.05;
+const DEATH_ANIM_DURATION: f32 = 0.5;
 
 #[derive(Resource, Default)]
 pub(crate) struct LevelEntity(pub(crate) Option<Entity>);
@@ -142,7 +179,8 @@ fn init_from_ldtk(
     new_never: Query<(), Added<NeverCell>>,
     level_query: Query<Entity, With<LevelIid>>,
 ) {
-    let has_new_cells = !new_permanent.is_empty() || !new_dynamic.is_empty() || !new_never.is_empty();
+    let has_new_cells =
+        !new_permanent.is_empty() || !new_dynamic.is_empty() || !new_never.is_empty();
     if !has_new_cells {
         return;
     }
@@ -176,7 +214,8 @@ fn init_from_ldtk(
         cell_entities.map.insert(pos, entity);
         commands.entity(entity).insert((
             GolCell,
-            AnimMan::new(CellAnim::Stable),
+            AnimMan::new(LeftCellAnim::Yy),
+            AnimMan::new(RightCellAnim::Yy).with_flip_x(true),
             Visibility::Inherited,
             RigidBody::Static,
             Collider::rectangle(TILE_SIZE, TILE_SIZE),
@@ -185,24 +224,16 @@ fn init_from_ldtk(
 
     tick_state.initialized = true;
     tick_state.next = tick_state.compute_next();
-
-    info!(
-        "GoL initialized: {} permanent, {} dynamic, {} pending",
-        tick_state.permanent.len(),
-        tick_state.current.len(),
-        tick_state.next.len()
-    );
 }
 
 fn process_tick_input(
     keyboard: Res<ButtonInput<KeyCode>>,
     controls: Res<ControlScheme>,
     dialogue: Res<DialogueState>,
+    death_rewind: Res<DeathRewind>,
     mut tick_state: ResMut<TickState>,
-    mut player_query: Query<(&mut Transform, &mut PlayerState), With<Player>>,
-    mut respawn_timer: ResMut<RespawnTimer>,
 ) {
-    if !tick_state.initialized || dialogue.active {
+    if !tick_state.initialized || dialogue.active || death_rewind.phase != DeathPhase::None {
         return;
     }
 
@@ -238,15 +269,112 @@ fn process_tick_input(
         tick_state.current = restored;
         tick_state.next = tick_state.compute_next();
     }
+}
 
-    let newly_alive: Vec<IVec2> = tick_state
-        .current
-        .difference(&old_current)
-        .copied()
-        .collect();
+const FALL_DEATH_DISTANCE: f32 = 128.0;
+const SPIKE_HITBOX: f32 = 34.0;
 
-    if !newly_alive.is_empty() {
-        handle_player_collision(&newly_alive, &mut player_query, &mut respawn_timer);
+fn check_spike_collision(
+    mut death_rewind: ResMut<DeathRewind>,
+    mut player_query: Query<(&Transform, &mut AnimMan<PlayerAnim>), With<Player>>,
+    spike_query: Query<&Transform, (With<Spike>, Without<Player>)>,
+) {
+    if death_rewind.phase != DeathPhase::None {
+        return;
+    }
+
+    let Ok((player_tf, mut player_anim)) = player_query.single_mut() else {
+        return;
+    };
+
+    let player_pos = player_tf.translation.truncate();
+    let player_half = PLAYER_SIZE / 2.0;
+    let spike_half = SPIKE_HITBOX / 2.0;
+
+    for spike_tf in &spike_query {
+        let spike_pos = spike_tf.translation.truncate();
+        let diff = (player_pos - spike_pos).abs();
+
+        if diff.x < player_half + spike_half && diff.y < player_half + spike_half {
+            player_anim.set(PlayerAnim::Die);
+            death_rewind.phase = DeathPhase::Dying;
+            death_rewind.timer = 0.0;
+            return;
+        }
+    }
+}
+
+fn check_restart_input(
+    keyboard: Res<ButtonInput<KeyCode>>,
+    dialogue: Res<DialogueState>,
+    mut death_rewind: ResMut<DeathRewind>,
+    mut player_query: Query<&mut AnimMan<PlayerAnim>, With<Player>>,
+) {
+    if death_rewind.phase != DeathPhase::None || dialogue.active {
+        return;
+    }
+
+    if keyboard.just_pressed(KeyCode::KeyR) {
+        if let Ok(mut player_anim) = player_query.single_mut() {
+            player_anim.set(PlayerAnim::Die);
+            death_rewind.phase = DeathPhase::Dying;
+            death_rewind.timer = 0.0;
+        }
+    }
+}
+
+fn check_player_collision(
+    tick_state: Res<TickState>,
+    mut death_rewind: ResMut<DeathRewind>,
+    mut player_query: Query<(&Transform, &mut AnimMan<PlayerAnim>), With<Player>>,
+) {
+    if death_rewind.phase != DeathPhase::None {
+        return;
+    }
+
+    let Ok((player_tf, mut player_anim)) = player_query.single_mut() else {
+        return;
+    };
+
+    let player_pos = player_tf.translation.truncate();
+    let player_half = PLAYER_SIZE / 2.0;
+    let player_area = PLAYER_SIZE * PLAYER_SIZE;
+    let tile_half = TILE_SIZE / 2.0;
+
+    // Check for crush death
+    for &pos in &tick_state.current {
+        let cell_world_pos = grid_to_world(pos);
+        let overlap = calculate_overlap(player_pos, player_half, cell_world_pos, tile_half);
+
+        if overlap <= 0.0 {
+            continue;
+        }
+
+        let overlap_ratio = overlap / player_area;
+
+        if overlap_ratio > CRUSH_THRESHOLD {
+            player_anim.set(PlayerAnim::Die);
+            death_rewind.phase = DeathPhase::Dying;
+            death_rewind.timer = 0.0;
+            return;
+        }
+    }
+
+    // Check for fall death - find lowest cell (permanent or dynamic)
+    let lowest_y = tick_state
+        .permanent
+        .iter()
+        .chain(tick_state.current.iter())
+        .map(|pos| pos.y)
+        .min();
+
+    if let Some(lowest_grid_y) = lowest_y {
+        let lowest_world_y = grid_to_world(IVec2::new(0, lowest_grid_y)).y;
+        if player_pos.y < lowest_world_y - FALL_DEATH_DISTANCE {
+            player_anim.set(PlayerAnim::Die);
+            death_rewind.phase = DeathPhase::Dying;
+            death_rewind.timer = 0.0;
+        }
     }
 }
 
@@ -258,7 +386,8 @@ fn update_existing_cells(
         (
             Entity,
             &GridCoords,
-            &mut AnimMan<CellAnim>,
+            &mut AnimMan<LeftCellAnim>,
+            &mut AnimMan<RightCellAnim>,
             Option<&RigidBody>,
         ),
         With<GolCell>,
@@ -270,14 +399,15 @@ fn update_existing_cells(
 
     let mut to_remove: Vec<IVec2> = Vec::new();
 
-    for (entity, coords, mut anim, has_collider) in &mut cell_query {
+    for (entity, coords, mut left_anim, mut right_anim, has_collider) in &mut cell_query {
         let pos = IVec2::new(coords.x, coords.y);
 
-        if let Some(state) = tick_state.cell_state(pos) {
+        if tick_state.cell_should_exist(pos) {
             let should_be_solid = tick_state.current.contains(&pos);
             let is_solid = has_collider.is_some();
 
-            anim.set(state);
+            left_anim.set(tick_state.left_state(pos));
+            right_anim.set(tick_state.right_state(pos));
 
             if should_be_solid && !is_solid {
                 commands
@@ -321,19 +451,23 @@ fn spawn_missing_cells(
             continue;
         }
 
-        let Some(state) = tick_state.cell_state(pos) else {
+        if !tick_state.cell_should_exist(pos) {
             continue;
-        };
+        }
 
         let world_pos = grid_to_world(pos);
         let should_be_solid = tick_state.current.contains(&pos);
+
+        let left_state = tick_state.left_state(pos);
+        let right_state = tick_state.right_state(pos);
 
         let mut entity_commands = commands.spawn((
             GolCell,
             GridCoords::new(pos.x, pos.y),
             Transform::from_xyz(world_pos.x, world_pos.y, 0.0),
             Visibility::Inherited,
-            AnimMan::new(state),
+            AnimMan::new(left_state),
+            AnimMan::new(right_state).with_flip_x(true),
             ChildOf(level_ent),
         ));
 
@@ -345,12 +479,12 @@ fn spawn_missing_cells(
     }
 }
 
-fn handle_player_collision(
-    appeared: &[IVec2],
-    player_query: &mut Query<(&mut Transform, &mut PlayerState), With<Player>>,
-    respawn_timer: &mut ResMut<RespawnTimer>,
+fn handle_player_push(
+    tick_state: Res<TickState>,
+    death_rewind: Res<DeathRewind>,
+    mut player_query: Query<(&mut Transform, &mut PlayerState), With<Player>>,
 ) {
-    if appeared.is_empty() {
+    if death_rewind.phase != DeathPhase::None {
         return;
     }
 
@@ -360,22 +494,14 @@ fn handle_player_collision(
 
     let player_pos = player_tf.translation.truncate();
     let player_half = PLAYER_SIZE / 2.0;
-    let player_area = PLAYER_SIZE * PLAYER_SIZE;
     let tile_half = TILE_SIZE / 2.0;
 
-    for &pos in appeared {
+    for &pos in &tick_state.current {
         let cell_world_pos = grid_to_world(pos);
         let overlap = calculate_overlap(player_pos, player_half, cell_world_pos, tile_half);
 
         if overlap <= 0.0 {
             continue;
-        }
-
-        let overlap_ratio = overlap / player_area;
-
-        if overlap_ratio > CRUSH_THRESHOLD {
-            respawn_timer.0 = Some(Timer::from_seconds(0.5, TimerMode::Once));
-            return;
         }
 
         if let Some((dir, amount)) =
@@ -444,47 +570,66 @@ fn find_push_direction(
         .map(|(dir, dist)| (dir, dist + 1.0))
 }
 
-fn handle_respawn(
+fn handle_death_rewind(
     mut commands: Commands,
-    mut respawn_timer: ResMut<RespawnTimer>,
+    mut death_rewind: ResMut<DeathRewind>,
+    mut tick_state: ResMut<TickState>,
     spawn_pos: Res<SpawnPosition>,
     time: Res<Time>,
     player_query: Query<Entity, With<Player>>,
 ) {
-    let Some(ref mut timer) = respawn_timer.0 else {
-        return;
-    };
-
-    timer.tick(time.delta());
-
-    if timer.just_finished() {
-        for entity in &player_query {
-            commands.entity(entity).despawn();
+    match death_rewind.phase {
+        DeathPhase::None => return,
+        DeathPhase::Dying => {
+            death_rewind.timer += time.delta_secs();
+            if death_rewind.timer >= DEATH_ANIM_DURATION {
+                // Death animation finished, despawn player and start rewinding
+                for entity in &player_query {
+                    commands.entity(entity).despawn();
+                }
+                death_rewind.phase = DeathPhase::Rewinding;
+                death_rewind.timer = 0.0;
+            }
         }
+        DeathPhase::Rewinding => {
+            death_rewind.timer += time.delta_secs();
 
-        if let Some(pos) = spawn_pos.0 {
-            crate::player::spawn_player(&mut commands, pos);
+            while death_rewind.timer >= REWIND_STEP_DURATION {
+                death_rewind.timer -= REWIND_STEP_DURATION;
+
+                if tick_state.history.is_empty() {
+                    if let Some(pos) = spawn_pos.0 {
+                        crate::player::spawn_player(&mut commands, pos);
+                    }
+                    death_rewind.phase = DeathPhase::None;
+                    death_rewind.timer = 0.0;
+
+                    // Reset to initial state
+                    tick_state.previous = None;
+                    tick_state.next = tick_state.compute_next();
+                    return;
+                }
+
+                // Rewind one step
+                let restored = tick_state.history.pop().unwrap();
+                tick_state.previous = tick_state.history.last().cloned();
+                tick_state.current = restored;
+                tick_state.next = tick_state.compute_next();
+            }
         }
-        respawn_timer.0 = None;
     }
 }
 
-pub(crate) const GHOST_ALPHA: f32 = 0.5;
+pub(crate) const GHOST_ALPHA: f32 = 0.65;
 
 fn cleanup_gol(
     mut commands: Commands,
     mut tick_state: ResMut<TickState>,
     mut cell_entities: ResMut<CellEntities>,
-    mut respawn_timer: ResMut<RespawnTimer>,
+    mut death_rewind: ResMut<DeathRewind>,
     mut level_entity: ResMut<LevelEntity>,
     gol_cells: Query<Entity, With<GolCell>>,
 ) {
-    info!(
-        "Cleaning up GoL: {} cells, {} entities in map",
-        gol_cells.iter().count(),
-        cell_entities.map.len()
-    );
-
     for entity in &gol_cells {
         commands.entity(entity).despawn();
     }
@@ -498,7 +643,8 @@ fn cleanup_gol(
     tick_state.initialized = false;
 
     cell_entities.map.clear();
-    respawn_timer.0 = None;
+    death_rewind.phase = DeathPhase::None;
+    death_rewind.timer = 0.0;
     level_entity.0 = None;
 }
 
@@ -507,7 +653,11 @@ fn sync_cell_opacity(
     mut sprite_query: Query<&mut Sprite>,
 ) {
     for (has_collider, children) in &cell_query {
-        let alpha = if has_collider.is_some() { 1.0 } else { GHOST_ALPHA };
+        let alpha = if has_collider.is_some() {
+            1.0
+        } else {
+            GHOST_ALPHA
+        };
         for child in children.iter() {
             if let Ok(mut sprite) = sprite_query.get_mut(child) {
                 sprite.color = sprite.color.with_alpha(alpha);
@@ -520,7 +670,7 @@ pub(crate) fn gol_plugin_fn(app: &mut App) {
     app.init_resource::<TickState>()
         .init_resource::<CellEntities>()
         .init_resource::<SpawnPosition>()
-        .init_resource::<RespawnTimer>()
+        .init_resource::<DeathRewind>()
         .init_resource::<LevelEntity>()
         .add_systems(OnExit(AppState::Playing), cleanup_gol)
         .add_systems(
@@ -528,9 +678,13 @@ pub(crate) fn gol_plugin_fn(app: &mut App) {
             (
                 init_from_ldtk,
                 process_tick_input,
+                check_restart_input,
                 update_existing_cells,
                 spawn_missing_cells,
-                handle_respawn,
+                check_player_collision,
+                check_spike_collision,
+                handle_player_push,
+                handle_death_rewind,
                 sync_cell_opacity,
             )
                 .chain()

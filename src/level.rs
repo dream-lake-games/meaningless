@@ -2,16 +2,15 @@ use avian2d::prelude::*;
 use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
+use crate::TILE_SIZE;
 use crate::anim::AnimMan;
-use crate::animations::CellAnim;
+use crate::animations::{LeftCellAnim, RightCellAnim, SpikeAnim};
 use crate::camera::HIGH_RES_LAYERS;
 use crate::gol::{GHOST_ALPHA, SpawnPosition};
 use crate::level_progress::LevelProgress;
 use crate::menu::AppState;
 use crate::menu::navigation::ControlScheme;
-use crate::palette;
 use crate::player::{Player, spawn_player};
-use crate::{TILE_SIZE, WINDOW_SIZE};
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct LevelSystemSet;
@@ -43,6 +42,9 @@ pub(crate) struct DynamicCell;
 pub(crate) struct NeverCell;
 
 #[derive(Component, Default)]
+pub(crate) struct Spike;
+
+#[derive(Component, Default)]
 pub(crate) struct PlayerSpawn;
 
 #[derive(Bundle, LdtkIntCell, Default)]
@@ -58,6 +60,11 @@ pub(crate) struct DynamicCellBundle {
 #[derive(Bundle, LdtkIntCell, Default)]
 pub(crate) struct NeverCellBundle {
     marker: NeverCell,
+}
+
+#[derive(Bundle, LdtkIntCell, Default)]
+struct SpikeBundle {
+    marker: Spike,
 }
 
 #[derive(Bundle, LdtkEntity, Default)]
@@ -90,7 +97,8 @@ fn add_permanent_cell_visuals(
 ) {
     for entity in &query {
         commands.entity(entity).insert((
-            AnimMan::new(CellAnim::Locked),
+            AnimMan::new(LeftCellAnim::Locked),
+            AnimMan::new(RightCellAnim::None).with_flip_x(true),
             Visibility::Inherited,
             RigidBody::Static,
             Collider::rectangle(TILE_SIZE, TILE_SIZE),
@@ -100,9 +108,20 @@ fn add_permanent_cell_visuals(
 
 fn add_never_cell_visuals(mut commands: Commands, query: Query<Entity, Added<NeverCell>>) {
     for entity in &query {
-        commands
-            .entity(entity)
-            .insert((AnimMan::new(CellAnim::Never), Visibility::Inherited));
+        commands.entity(entity).insert((
+            AnimMan::new(LeftCellAnim::Never),
+            AnimMan::new(RightCellAnim::None).with_flip_x(true),
+            Visibility::Inherited,
+        ));
+    }
+}
+
+fn add_spike_visuals(mut commands: Commands, query: Query<Entity, Added<Spike>>) {
+    for entity in &query {
+        commands.entity(entity).insert((
+            AnimMan::new(SpikeAnim::Spikes),
+            Visibility::Inherited,
+        ));
     }
 }
 
@@ -133,7 +152,6 @@ fn spawn_player_at_spawn_point(
         let pos = transform.translation.truncate();
         spawn_pos.0 = Some(pos);
         spawn_player(&mut commands, pos);
-        info!("Player spawned at ({}, {})", pos.x, pos.y);
     }
 }
 
@@ -144,8 +162,8 @@ fn spawn_control_hints(
     help_text: Res<HelpText>,
 ) {
     let default_text = match *controls {
-        ControlScheme::Arrow => "ARROWS move, F tick forward, D tick back, ESC menu",
-        ControlScheme::Wasd => "WASD move, K tick forward, J tick back, ESC menu",
+        ControlScheme::Arrow => "ARROWS move, F forward, D back, R restart, ESC menu",
+        ControlScheme::Wasd => "WASD move, K forward, J back, R restart, ESC menu",
     };
 
     let text = help_text.override_text.as_deref().unwrap_or(default_text);
@@ -200,8 +218,8 @@ fn update_control_hints(
     mut bg_query: Query<&mut Sprite, With<ControlHintsBg>>,
 ) {
     let default_text = match *controls {
-        ControlScheme::Arrow => "ARROWS move, F tick forward, D tick back, ESC menu",
-        ControlScheme::Wasd => "WASD move, K tick forward, J tick back, ESC menu",
+        ControlScheme::Arrow => "ARROWS move, F forward, D back, R restart, ESC menu",
+        ControlScheme::Wasd => "WASD move, K forward, J back, R restart, ESC menu",
     };
 
     let text = help_text.override_text.as_deref().unwrap_or(default_text);
@@ -234,12 +252,10 @@ fn cleanup_level(
     mut spawn_pos: ResMut<SpawnPosition>,
 ) {
     for entity in &level_query {
-        info!("Despawning level entity");
         commands.entity(entity).despawn();
     }
 
     for entity in &player_query {
-        info!("Despawning player entity");
         commands.entity(entity).despawn();
     }
 
@@ -262,6 +278,7 @@ pub(crate) fn level_plugin_fn(app: &mut App) {
         .register_ldtk_int_cell::<PermanentCellBundle>(1)
         .register_ldtk_int_cell::<DynamicCellBundle>(2)
         .register_ldtk_int_cell::<NeverCellBundle>(3)
+        .register_ldtk_int_cell_for_layer::<SpikeBundle>("Spikes", 1)
         .register_ldtk_entity::<PlayerSpawnBundle>("PlayerSpawn")
         .add_systems(
             OnEnter(AppState::Playing),
@@ -273,6 +290,7 @@ pub(crate) fn level_plugin_fn(app: &mut App) {
             (
                 add_permanent_cell_visuals,
                 add_never_cell_visuals,
+                add_spike_visuals,
                 spawn_player_at_spawn_point,
                 sync_never_cell_opacity,
                 update_control_hints,

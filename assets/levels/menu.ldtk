@@ -373,36 +373,36 @@
 					"entityInstances": [
 						{
 							"__identifier": "Text",
-							"__grid": [19,30],
+							"__grid": [19,32],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#000000",
-							"iid": "ccc296e0-fa90-11f0-bf22-e988f04d6eab",
+							"iid": "295f7f10-fa90-11f0-b65c-e547203cf1aa",
 							"width": 16,
 							"height": 8,
 							"defUid": 4,
-							"px": [154,240],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "PRESS TAB TO TOGGLE", "__tile": null, "defUid": 6, "realEditorValues": [{
+							"px": [152,256],
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "press TAB to toggle", "__tile": null, "defUid": 6, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["PRESS TAB TO TOGGLE"]
+								"params": ["press TAB to toggle"]
 							}] }]
 						},
 						{
 							"__identifier": "Text",
-							"__grid": [19,34],
+							"__grid": [19,35],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#000000",
-							"iid": "ef591cb0-fa90-11f0-bf22-af6c1d55df87",
+							"iid": "2a378f90-fa90-11f0-b65c-9dbde383ba4f",
 							"width": 16,
 							"height": 8,
 							"defUid": 4,
-							"px": [154,272],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "PRESS ENTER TO CONTINUE", "__tile": null, "defUid": 6, "realEditorValues": [{
+							"px": [152,280],
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "press ENTER to continue", "__tile": null, "defUid": 6, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["PRESS ENTER TO CONTINUE"]
+								"params": ["press ENTER to continue"]
 							}] }]
 						},
 						{
@@ -412,14 +412,14 @@
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#000000",
-							"iid": "f5553f40-fa90-11f0-bf22-99110a5b6705",
+							"iid": "2ab1a190-fa90-11f0-b65c-fb25b6b9f4c5",
 							"width": 16,
 							"height": 8,
 							"defUid": 4,
-							"px": [153,304],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "PRESS ESCAPE TO GO BACK", "__tile": null, "defUid": 6, "realEditorValues": [{
+							"px": [152,304],
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "press ESC to go back", "__tile": null, "defUid": 6, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["PRESS ESCAPE TO GO BACK"]
+								"params": ["press ESC to go back"]
 							}] }]
 						}
 					]
@@ -546,36 +546,53 @@
 					"entityInstances": [
 						{
 							"__identifier": "Text",
-							"__grid": [18,37],
+							"__grid": [19,38],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#000000",
-							"iid": "43aacd30-fa90-11f0-bf22-01c8a8fcf982",
+							"iid": "3bbd08d0-fa90-11f0-b65c-db279b760c3b",
 							"width": 16,
 							"height": 8,
 							"defUid": 4,
-							"px": [150,300],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "PRESS ESCAPE TO GO BACK", "__tile": null, "defUid": 6, "realEditorValues": [{
+							"px": [152,304],
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "press ESC to go back", "__tile": null, "defUid": 6, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["PRESS ESCAPE TO GO BACK"]
+								"params": ["press ESC to go back"]
 							}] }]
 						},
 						{
 							"__identifier": "Text",
-							"__grid": [18,33],
+							"__grid": [19,35],
 							"__pivot": [0,0],
 							"__tags": [],
 							"__tile": null,
 							"__smartColor": "#000000",
-							"iid": "84bfb880-fa90-11f0-bf22-9b7a1652a238",
+							"iid": "40f69eb0-fa90-11f0-b65c-87142a10c53a",
 							"width": 16,
 							"height": 8,
 							"defUid": 4,
-							"px": [150,267],
-							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "PRESS ENTER TO SELECT", "__tile": null, "defUid": 6, "realEditorValues": [{
+							"px": [152,280],
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "press ENTER to select", "__tile": null, "defUid": 6, "realEditorValues": [{
 								"id": "V_String",
-								"params": ["PRESS ENTER TO SELECT"]
+								"params": ["press ENTER to select"]
+							}] }]
+						},
+						{
+							"__identifier": "Text",
+							"__grid": [19,32],
+							"__pivot": [0,0],
+							"__tags": [],
+							"__tile": null,
+							"__smartColor": "#000000",
+							"iid": "45ec74d0-fa90-11f0-b65c-176d3e8e3e59",
+							"width": 16,
+							"height": 8,
+							"defUid": 4,
+							"px": [152,256],
+							"fieldInstances": [{ "__identifier": "text", "__type": "String", "__value": "navigate with arrows/WASD", "__tile": null, "defUid": 6, "realEditorValues": [{
+								"id": "V_String",
+								"params": ["navigate with arrows/WASD"]
 							}] }]
 						}
 					]

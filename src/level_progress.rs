@@ -18,6 +18,16 @@ pub(crate) struct LevelProgress {
     pub(crate) selected: usize,
     pub(crate) current_playing: Option<usize>,
     pub(crate) total_levels: usize,
+    pub(crate) level_names: Vec<String>,
+}
+
+impl LevelProgress {
+    pub(crate) fn get_level_name(&self, level: usize) -> &str {
+        self.level_names
+            .get(level)
+            .map(|s| s.as_str())
+            .unwrap_or("???")
+    }
 }
 
 #[derive(Resource, Default)]
@@ -56,7 +66,6 @@ impl LevelProgress {
         LevelState::Unlocked
     }
 
-    #[allow(dead_code)]
     pub(crate) fn complete_level(&mut self, level: usize) {
         self.completed.insert(level);
         self.selected = level;
@@ -81,7 +90,6 @@ fn load_from_disk() -> Option<SaveData> {
 }
 
 #[cfg(not(target_family = "wasm"))]
-#[allow(dead_code)]
 fn save_to_disk(data: &SaveData) {
     if let Some(path) = get_save_path() {
         if let Some(parent) = path.parent() {
@@ -102,7 +110,6 @@ fn load_from_disk() -> Option<SaveData> {
 }
 
 #[cfg(target_family = "wasm")]
-#[allow(dead_code)]
 fn save_to_disk(data: &SaveData) {
     if let Some(window) = web_sys::window() {
         if let Ok(Some(storage)) = window.local_storage() {
@@ -113,10 +120,12 @@ fn save_to_disk(data: &SaveData) {
     }
 }
 
-fn load_progress(mut progress: ResMut<LevelProgress>) {
+fn load_progress(mut progress: ResMut<LevelProgress>, mut last_saved: ResMut<LastSavedCount>) {
     if let Some(data) = load_from_disk() {
         info!("Loaded {} completed levels from save", data.completed.len());
+        let count = data.completed.len();
         progress.completed = data.completed.into_iter().collect();
+        last_saved.0 = count;
     }
 }
 
@@ -138,14 +147,46 @@ fn detect_level_count(
     let Some(h) = &handle.0 else { return };
     let Some(project) = projects.get(h) else { return };
 
-    let count = project.json_data().levels.len();
+    let levels = &project.json_data().levels;
+    let count = levels.len();
     progress.total_levels = count;
+    
+    progress.level_names = levels
+        .iter()
+        .map(|level| {
+            for field in &level.field_instances {
+                if field.identifier == "Name" {
+                    if let bevy_ecs_ldtk::ldtk::FieldValue::String(Some(name)) = &field.value {
+                        return name.clone();
+                    }
+                }
+            }
+            level.identifier.clone()
+        })
+        .collect();
+    
     info!("Detected {} levels from play.ldtk", count);
+}
+
+#[derive(Resource, Default)]
+struct LastSavedCount(usize);
+
+fn save_progress_on_change(progress: Res<LevelProgress>, mut last_saved: ResMut<LastSavedCount>) {
+    let current_count = progress.completed.len();
+    if current_count != last_saved.0 && current_count > 0 {
+        let data = SaveData {
+            completed: progress.completed.iter().copied().collect(),
+        };
+        save_to_disk(&data);
+        last_saved.0 = current_count;
+        info!("Saved progress: {} levels completed", current_count);
+    }
 }
 
 pub(crate) fn level_progress_plugin_fn(app: &mut App) {
     app.init_resource::<LevelProgress>()
         .init_resource::<PlayLdtkHandle>()
+        .init_resource::<LastSavedCount>()
         .add_systems(Startup, (load_progress, load_play_ldtk))
-        .add_systems(Update, detect_level_count);
+        .add_systems(Update, (detect_level_count, save_progress_on_change));
 }

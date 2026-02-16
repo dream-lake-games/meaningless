@@ -89,7 +89,6 @@ fn navigate_menu(
     if nav.waiting_for_release {
         if !any_key_held {
             nav.waiting_for_release = false;
-            info!("Keys released, navigation enabled");
         }
         return;
     }
@@ -116,7 +115,6 @@ fn navigate_menu(
 
         if should_toggle {
             *controls = controls.toggle();
-            info!("Control scheme: {:?}", *controls);
             nav.cooldown_remaining = TRANSITION_COOLDOWN;
             nav.waiting_for_release = true;
             return;
@@ -143,7 +141,6 @@ fn navigate_menu(
     };
 
     if let Some(screen) = new_screen {
-        info!("Menu transition: {:?} -> {:?}", nav.screen, screen);
         nav.screen = screen;
         nav.cooldown_remaining = TRANSITION_COOLDOWN;
         nav.waiting_for_release = true;
@@ -152,7 +149,6 @@ fn navigate_menu(
 }
 
 fn reset_navigation(mut nav: ResMut<MenuNavigation>, mut level_selection: ResMut<LevelSelection>) {
-    info!("Resetting menu navigation, keeping screen: {:?}", nav.screen);
     nav.cooldown_remaining = 0.0;
     nav.waiting_for_release = true;
     *level_selection = LevelSelection::index(nav.screen.level_index());

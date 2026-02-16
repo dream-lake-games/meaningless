@@ -6,6 +6,7 @@ mod anim;
 mod animations;
 mod bg;
 mod camera;
+mod flag;
 mod gol;
 mod level;
 mod level_progress;
@@ -21,23 +22,22 @@ pub(crate) const WINDOW_SIZE: u32 = INTERNAL_SIZE * 2;
 pub(crate) const TILE_SIZE: f32 = 32.0;
 
 // ============================================================================
-// DEV HACK: Uncomment the line below to skip menu and go straight to level 0
+// DEV HACK: Uncomment the line below to skip to level select with WASD
 // ============================================================================
-const DEV_SKIP_MENU: bool = true;
-// const DEV_SKIP_MENU: bool = false;
+const DEV_SKIP_TO_LEVEL_SELECT: bool = true;
+// const DEV_SKIP_TO_LEVEL_SELECT: bool = false;
 
-fn dev_skip_to_level(
+fn dev_skip_to_level_select(
     mut controls: ResMut<menu::navigation::ControlScheme>,
-    mut progress: ResMut<level_progress::LevelProgress>,
-    mut next_state: ResMut<NextState<menu::AppState>>,
+    mut nav: ResMut<menu::navigation::MenuNavigation>,
+    mut level_selection: ResMut<bevy_ecs_ldtk::prelude::LevelSelection>,
 ) {
-    if !DEV_SKIP_MENU {
+    if !DEV_SKIP_TO_LEVEL_SELECT {
         return;
     }
     *controls = menu::navigation::ControlScheme::Wasd;
-    progress.current_playing = Some(0);
-    next_state.set(menu::AppState::Playing);
-    info!("DEV: Skipping menu, starting level 0 with WASD controls");
+    nav.screen = menu::navigation::MenuScreen::LevelSelect;
+    *level_selection = bevy_ecs_ldtk::prelude::LevelSelection::index(2);
 }
 
 fn main() {
@@ -73,12 +73,12 @@ fn main() {
         level::level_plugin_fn,
         gol::gol_plugin_fn,
         sign::sign_plugin_fn,
+        flag::flag_plugin_fn,
         transition::transition_plugin_fn,
     ));
 
-    // DEV HACK: Skip menu system
-    if DEV_SKIP_MENU {
-        app.add_systems(Startup, dev_skip_to_level);
+    if DEV_SKIP_TO_LEVEL_SELECT {
+        app.add_systems(Startup, dev_skip_to_level_select);
     }
 
     app.run();

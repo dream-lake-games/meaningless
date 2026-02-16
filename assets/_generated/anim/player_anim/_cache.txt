@@ -7,3 +7,5 @@ air_move,2,20,20
 air_still,1,20,20
 land,1,20,20
 push,5,20,20
+die,4,20,20
+none,1,20,20

@@ -3,11 +3,40 @@
 	"uniqueIdentifer": "4da6ef00-fa90-11f0-83a2-c3bb2c261e0d",
 	"x": -1,
 	"y": -1,
-	"width": 800,
+	"width": 1280,
 	"height": 736,
 	"bgColor": "#696A79",
 	"neighbourLevels": [],
-	"customFields" : {},
+	"customFields": {
+		"Name": "Unstable Bridge"
+	},
 	"layers": [],
-	"entities" : {}
+	"entities": {
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "b018b3c0-fa90-11f0-b242-570c4bf4cbd8",
+				"layer": "Entities",
+				"x": 1024,
+				"y": 352,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		],
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "b35e68e0-fa90-11f0-b242-55c07b04067a",
+				"layer": "Entities",
+				"x": 96,
+				"y": 352,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		]
+	}
 }

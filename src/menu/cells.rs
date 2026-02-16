@@ -171,11 +171,6 @@ fn init_dynamic_cells(
 
     if !state.initialized && !state.permanent.is_empty() {
         state.initialized = true;
-        info!(
-            "Menu initialized: {} permanent, {} dynamic",
-            state.permanent.len(),
-            state.current.len()
-        );
     }
 }
 
@@ -252,13 +247,6 @@ fn handle_level_change(
     if prev_level.0 == current_index {
         return;
     }
-
-    info!(
-        "Level changed: {:?} -> {:?}, clearing {} dynamic cell references",
-        prev_level.0,
-        current_index,
-        state.entities.len()
-    );
 
     state.permanent.clear();
     state.current.clear();

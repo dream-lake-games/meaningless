@@ -63,13 +63,6 @@ fn handle_level_change(
         return;
     }
 
-    info!(
-        "Text: level changed {:?} -> {:?}, despawning {} text entities",
-        state.prev_level,
-        current_level,
-        text_query.iter().count()
-    );
-
     for entity in &text_query {
         commands.entity(entity).despawn();
     }

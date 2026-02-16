@@ -1,0 +1,29 @@
+{
+	"identifier": "Level_2",
+	"uniqueIdentifer": "ba1ea950-fa90-11f0-b242-cfd4dbb89f52",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Quicksand"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "d056ae20-fa90-11f0-b242-654ca2edfdd9",
+				"layer": "Entities",
+				"x": 288,
+				"y": 128,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		]
+	}
+}

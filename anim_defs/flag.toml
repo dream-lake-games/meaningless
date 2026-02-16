@@ -1,0 +1,9 @@
+[[anim]]
+name = "FlagAnim"
+file = "assets/misc/flag.aseprite"
+default = "Wave"
+
+[[anim]]
+name = "FlagIndicatorAnim"
+file = "assets/misc/flag.aseprite"
+default = "Indicator"

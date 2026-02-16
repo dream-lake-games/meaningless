@@ -32,14 +32,9 @@ fn spawn_level_squares(
     nav: Res<MenuNavigation>,
     mut state: ResMut<LevelSelectState>,
 ) {
-    if nav.screen != MenuScreen::LevelSelect || state.spawned {
+    if nav.screen != MenuScreen::LevelSelect || state.spawned || progress.total_levels == 0 {
         return;
     }
-
-    info!(
-        "Spawning {} level squares, selected={}, completed={:?}",
-        progress.total_levels, progress.selected, progress.completed
-    );
 
     for level in 0..progress.total_levels {
         let pos = level_to_pos(level);
@@ -50,12 +45,6 @@ fn spawn_level_squares(
         );
 
         let initial_anim = get_anim_for_level(&progress, level, level == progress.selected);
-        let level_state = progress.level_state(level);
-
-        info!(
-            "  Level {}: pos=({},{}), world=({:.1},{:.1}), state={:?}, anim={:?}",
-            level, pos.x, pos.y, world_pos.x, world_pos.y, level_state, initial_anim
-        );
 
         commands.spawn((
             LevelSelectMarker,
@@ -83,9 +72,6 @@ fn despawn_level_squares(
     if !state.spawned {
         return;
     }
-
-    let count = query.iter().count();
-    info!("Despawning {} level squares", count);
 
     for entity in &query {
         commands.entity(entity).despawn();
@@ -169,7 +155,6 @@ fn navigate_level_select(
 
         if let Some(target_level) = crate::spiral::pos_to_level(target_pos) {
             if progress.is_unlocked(target_level) {
-                info!("Level select: {} -> {}", progress.selected, target_level);
                 progress.selected = target_level;
                 state.cooldown = 0.15;
             }
@@ -193,14 +178,20 @@ fn start_level(
 
     if keyboard.just_pressed(KeyCode::Enter) {
         let level = progress.selected;
-        if progress.is_unlocked(level) && progress.level_state(level) != LevelState::Done {
-            info!("Starting level {}", level);
+        if progress.is_unlocked(level) {
             transition.request(TransitionTarget::StartLevel(level));
         }
     }
 }
 
-fn cleanup_on_menu_exit(mut state: ResMut<LevelSelectState>) {
+fn cleanup_on_menu_exit(
+    mut commands: Commands,
+    mut state: ResMut<LevelSelectState>,
+    query: Query<Entity, With<LevelSelectMarker>>,
+) {
+    for entity in &query {
+        commands.entity(entity).despawn();
+    }
     state.spawned = false;
 }
 

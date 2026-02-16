@@ -51,7 +51,6 @@ impl TransitionState {
         if self.phase != TransitionPhase::None {
             return;
         }
-        info!("Transition requested: {:?}", target);
         self.phase = TransitionPhase::FadingOut { step: 0 };
         self.step_timer = 0.0;
         self.dark_frames = 0;
@@ -104,7 +103,6 @@ fn update_transition(
                 let next_step = step + 1;
 
                 if next_step >= FADE_COLORS.len() {
-                    info!("Fade out complete, executing transition");
                     state.phase = TransitionPhase::Dark;
                     state.dark_frames = 0;
                     overlay.color = palette::BLACK;
@@ -137,7 +135,6 @@ fn update_transition(
                         let target_pos = player_tf.translation.truncate();
                         camera_tf.translation.x = target_pos.x.round();
                         camera_tf.translation.y = target_pos.y.round();
-                        info!("Camera snapped to player at ({}, {})", target_pos.x, target_pos.y);
                         state.camera_snapped = true;
                     }
                 }
@@ -151,7 +148,6 @@ fn update_transition(
                     if let Ok(mut camera_tf) = camera_q.single_mut() {
                         camera_tf.translation.x = 0.0;
                         camera_tf.translation.y = 0.0;
-                        info!("Camera snapped to origin (timeout)");
                     }
                 }
                 state.phase = TransitionPhase::FadingIn { step: FADE_COLORS.len() - 1 };
@@ -166,7 +162,6 @@ fn update_transition(
                 state.step_timer = 0.0;
 
                 if step == 0 {
-                    info!("Fade in complete");
                     state.phase = TransitionPhase::None;
                     state.target = None;
                     overlay.color = Color::NONE;
@@ -193,7 +188,6 @@ fn handle_escape_during_play(
     }
 
     if keyboard.just_pressed(KeyCode::Escape) {
-        info!("Escape pressed, returning to menu");
         transition.request(TransitionTarget::ReturnToMenu);
     }
 }

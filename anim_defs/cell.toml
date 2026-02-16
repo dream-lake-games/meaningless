@@ -1,7 +1,23 @@
 [[anim]]
-name = "CellAnim"
+name = "LeftCellAnim"
 file = "assets/cell/cell.aseprite"
-default = "Stable"
+default = "Yy"
 
 [anim.variants.Never]
+no_stutter = true
+
+[[anim]]
+name = "RightCellAnim"
+file = "assets/cell/cell.aseprite"
+default = "Yy"
+
+[anim.variants.None]
+no_stutter = true
+
+[[anim]]
+name = "SpikeAnim"
+file = "assets/cell/cell.aseprite"
+default = "Spikes"
+
+[anim.variants.Spikes]
 no_stutter = true
