@@ -1,0 +1,59 @@
+{
+	"identifier": "Level_6",
+	"uniqueIdentifer": "44ea4fa0-fa90-11f0-9d09-d133fe356f5e",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Cargo"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "e90c2220-fa90-11f0-9d09-81e1aae864ab",
+				"layer": "Entities",
+				"x": 96,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Sign": [
+			{
+				"id": "Sign",
+				"iid": "eafe2e20-fa90-11f0-9d09-4536e41e7034",
+				"layer": "Entities",
+				"x": 160,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"If you get lost, the blinking flags on the edge of the screen may help."
+					]
+				}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "19672190-fa90-11f0-9d09-71b4bec78627",
+				"layer": "Entities",
+				"x": 576,
+				"y": 288,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

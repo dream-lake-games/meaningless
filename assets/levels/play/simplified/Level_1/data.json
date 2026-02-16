@@ -37,6 +37,24 @@
 				"color": 8978176,
 				"customFields" : {}
 			}
+		],
+		"Sign": [
+			{
+				"id": "Sign",
+				"iid": "754b1410-fa90-11f0-9d09-cd48c85deb69",
+				"layer": "Entities",
+				"x": 160,
+				"y": 352,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"Stuck? Remember: you can tick forward whenever you want.",
+						"(Even when you are in the air.)"
+					]
+				}
+			}
 		]
 	}
 }

@@ -1,0 +1,42 @@
+{
+	"identifier": "Level_12",
+	"uniqueIdentifer": "b6abb190-fa90-11f0-9d09-8f04b06e9b54",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Tumbler"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "aef8d6f0-fa90-11f0-9d09-cda999aa2742",
+				"layer": "Entities",
+				"x": 256,
+				"y": 416,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "1ca5ed50-fa90-11f0-9d09-3b318d101ed7",
+				"layer": "Entities",
+				"x": 352,
+				"y": 224,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

@@ -1,0 +1,42 @@
+{
+	"identifier": "Level_5",
+	"uniqueIdentifer": "58bad4e0-fa90-11f0-9d09-793deec32cf9",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Inside Out"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "d4a899c0-fa90-11f0-9d09-c5ec91e453ba",
+				"layer": "Entities",
+				"x": 192,
+				"y": 448,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "256d05d0-fa90-11f0-9d09-fd82c2c7b3e0",
+				"layer": "Entities",
+				"x": 288,
+				"y": 224,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

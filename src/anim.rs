@@ -146,6 +146,10 @@ impl<A: Anim> AnimMan<A> {
         A::from_index(self.variant_index)
     }
 
+    pub fn frame(&self) -> usize {
+        self.frame
+    }
+
     fn current(&self) -> &AnimVariant {
         &self.table[self.variant_index]
     }

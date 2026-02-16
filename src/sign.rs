@@ -7,7 +7,10 @@ use crate::animations::{PlayerAnim, SignAnim};
 use crate::camera::HIGH_RES_LAYERS;
 use crate::level::HelpText;
 use crate::menu::AppState;
-use crate::player::Player;
+use crate::player::{Player, PlayerSystemSet};
+
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub(crate) struct SignSystemSet;
 
 const INTERACT_DISTANCE: f32 = 32.0;
 const DIALOGUE_BOX_WIDTH: f32 = 500.0;
@@ -371,6 +374,8 @@ pub(crate) fn sign_plugin_fn(app: &mut App) {
                 update_dialogue_text,
             )
                 .chain()
+                .in_set(SignSystemSet)
+                .after(PlayerSystemSet)
                 .run_if(in_state(AppState::Playing)),
         )
         .add_systems(OnExit(AppState::Playing), cleanup_dialogue);

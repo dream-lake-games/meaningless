@@ -1,0 +1,85 @@
+{
+	"identifier": "Level_9",
+	"uniqueIdentifer": "b4060d00-fa90-11f0-9d09-01d7e6087583",
+	"x": -1,
+	"y": -1,
+	"width": 768,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "MOAR FLAGS"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "ee3e39c0-fa90-11f0-9d09-672c044fd30f",
+				"layer": "Entities",
+				"x": 256,
+				"y": 416,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "1a4b89f0-fa90-11f0-9d09-41942f77cd31",
+				"layer": "Entities",
+				"x": 128,
+				"y": 384,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			},
+			{
+				"id": "Flag",
+				"iid": "1b0cde20-fa90-11f0-9d09-af5b38f2ae3e",
+				"layer": "Entities",
+				"x": 288,
+				"y": 224,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			},
+			{
+				"id": "Flag",
+				"iid": "1c99bfb0-fa90-11f0-9d09-91a5f3ec93e3",
+				"layer": "Entities",
+				"x": 448,
+				"y": 384,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		],
+		"Sign": [
+			{
+				"id": "Sign",
+				"iid": "4f0aa6d0-fa90-11f0-9d09-9f460b652bd3",
+				"layer": "Entities",
+				"x": 320,
+				"y": 416,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"One day, Bog lost the flag they were using in levels.",
+						"So Bog ordered a new one from the planet Amazon.",
+						"Then - of course - Bog found the first one.",
+						"But then Bog realized:",
+						"Some levels are better with more flags."
+					]
+				}
+			}
+		]
+	}
+}

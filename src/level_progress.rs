@@ -3,8 +3,6 @@ use bevy_ecs_ldtk::prelude::*;
 use serde::{Deserialize, Serialize};
 use std::collections::HashSet;
 
-use crate::spiral::{level_to_pos, pos_to_level};
-
 #[derive(Clone, Copy, PartialEq, Eq, Debug)]
 pub(crate) enum LevelState {
     Locked,
@@ -31,7 +29,7 @@ impl LevelProgress {
 }
 
 #[derive(Resource, Default)]
-struct PlayLdtkHandle(Option<Handle<LdtkProject>>);
+pub(crate) struct PlayLdtkHandle(pub(crate) Option<Handle<LdtkProject>>);
 
 impl LevelProgress {
     pub(crate) fn is_unlocked(&self, level: usize) -> bool {
@@ -41,19 +39,7 @@ impl LevelProgress {
         if level == 0 {
             return true;
         }
-        if self.completed.contains(&level) {
-            return true;
-        }
-
-        let pos = level_to_pos(level);
-        for dir in [IVec2::X, IVec2::NEG_X, IVec2::Y, IVec2::NEG_Y] {
-            if let Some(neighbor) = pos_to_level(pos + dir) {
-                if self.completed.contains(&neighbor) {
-                    return true;
-                }
-            }
-        }
-        false
+        self.completed.contains(&(level - 1))
     }
 
     pub(crate) fn level_state(&self, level: usize) -> LevelState {
@@ -122,7 +108,6 @@ fn save_to_disk(data: &SaveData) {
 
 fn load_progress(mut progress: ResMut<LevelProgress>, mut last_saved: ResMut<LastSavedCount>) {
     if let Some(data) = load_from_disk() {
-        info!("Loaded {} completed levels from save", data.completed.len());
         let count = data.completed.len();
         progress.completed = data.completed.into_iter().collect();
         last_saved.0 = count;
@@ -164,8 +149,6 @@ fn detect_level_count(
             level.identifier.clone()
         })
         .collect();
-    
-    info!("Detected {} levels from play.ldtk", count);
 }
 
 #[derive(Resource, Default)]

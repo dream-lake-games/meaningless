@@ -13,6 +13,7 @@ mod level_progress;
 mod menu;
 pub(crate) mod palette;
 mod player;
+pub(crate) mod sfx;
 mod sign;
 mod spiral;
 mod transition;
@@ -21,23 +22,11 @@ pub(crate) const INTERNAL_SIZE: u32 = 320;
 pub(crate) const WINDOW_SIZE: u32 = INTERNAL_SIZE * 2;
 pub(crate) const TILE_SIZE: f32 = 32.0;
 
-// ============================================================================
-// DEV HACK: Uncomment the line below to skip to level select with WASD
-// ============================================================================
-const DEV_SKIP_TO_LEVEL_SELECT: bool = true;
-// const DEV_SKIP_TO_LEVEL_SELECT: bool = false;
-
-fn dev_skip_to_level_select(
-    mut controls: ResMut<menu::navigation::ControlScheme>,
-    mut nav: ResMut<menu::navigation::MenuNavigation>,
-    mut level_selection: ResMut<bevy_ecs_ldtk::prelude::LevelSelection>,
-) {
-    if !DEV_SKIP_TO_LEVEL_SELECT {
-        return;
-    }
-    *controls = menu::navigation::ControlScheme::Wasd;
-    nav.screen = menu::navigation::MenuScreen::LevelSelect;
-    *level_selection = bevy_ecs_ldtk::prelude::LevelSelection::index(2);
+fn start_music(mut commands: Commands, asset_server: Res<AssetServer>) {
+    commands.spawn((
+        AudioPlayer::new(asset_server.load("music/stumble_around.ogg")),
+        PlaybackSettings::LOOP,
+    ));
 }
 
 fn main() {
@@ -75,11 +64,10 @@ fn main() {
         sign::sign_plugin_fn,
         flag::flag_plugin_fn,
         transition::transition_plugin_fn,
+        sfx::sfx_plugin_fn,
     ));
 
-    if DEV_SKIP_TO_LEVEL_SELECT {
-        app.add_systems(Startup, dev_skip_to_level_select);
-    }
+    app.add_systems(Startup, start_music);
 
     app.run();
 }

@@ -1,0 +1,42 @@
+{
+	"identifier": "Level_3",
+	"uniqueIdentifer": "27f62910-fa90-11f0-9d09-5556fa87351e",
+	"x": -1,
+	"y": -1,
+	"width": 1056,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Staircase"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "42246e50-fa90-11f0-9d09-85d58b60edb1",
+				"layer": "Entities",
+				"x": 288,
+				"y": 512,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "c6baff30-fa90-11f0-9d09-d314be72e805",
+				"layer": "Entities",
+				"x": 576,
+				"y": 288,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

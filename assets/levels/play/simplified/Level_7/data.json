@@ -1,0 +1,42 @@
+{
+	"identifier": "Level_7",
+	"uniqueIdentifer": "47fc26b0-fa90-11f0-9d09-5709d56df16e",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "How Do I Get In There?"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "4cb78be0-fa90-11f0-9d09-d5c766a85d9a",
+				"layer": "Entities",
+				"x": 288,
+				"y": 160,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "5b035df0-fa90-11f0-9d09-8fe2e8df165a",
+				"layer": "Entities",
+				"x": 288,
+				"y": 288,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

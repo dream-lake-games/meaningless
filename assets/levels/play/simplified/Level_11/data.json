@@ -1,0 +1,53 @@
+{
+	"identifier": "Level_11",
+	"uniqueIdentifer": "2fe0ed80-fa90-11f0-9d09-5990d64a58ec",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Double Trouble"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "421d5ab0-fa90-11f0-9d09-055863fb2076",
+				"layer": "Entities",
+				"x": 384,
+				"y": 288,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "fb5e47f0-fa90-11f0-9d09-35c586adbd03",
+				"layer": "Entities",
+				"x": 160,
+				"y": 384,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			},
+			{
+				"id": "Flag",
+				"iid": "fc811d10-fa90-11f0-9d09-5d95d142b51f",
+				"layer": "Entities",
+				"x": 576,
+				"y": 128,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

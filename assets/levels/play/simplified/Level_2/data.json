@@ -1,6 +1,6 @@
 {
 	"identifier": "Level_2",
-	"uniqueIdentifer": "ba1ea950-fa90-11f0-b242-cfd4dbb89f52",
+	"uniqueIdentifer": "5770d340-fa90-11f0-9d09-23258c1da054",
 	"x": -1,
 	"y": -1,
 	"width": 640,
@@ -8,17 +8,48 @@
 	"bgColor": "#696A79",
 	"neighbourLevels": [],
 	"customFields": {
-		"Name": "Quicksand"
+		"Name": "Ladder"
 	},
 	"layers": [],
 	"entities": {
-		"PlayerSpawn": [
+		"Flag": [
 			{
-				"id": "PlayerSpawn",
-				"iid": "d056ae20-fa90-11f0-b242-654ca2edfdd9",
+				"id": "Flag",
+				"iid": "efcbd0e0-fa90-11f0-9d09-bf18e912f6cd",
+				"layer": "Entities",
+				"x": 288,
+				"y": 96,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		],
+		"Sign": [
+			{
+				"id": "Sign",
+				"iid": "06def370-fa90-11f0-9d09-7177bedd6fae",
 				"layer": "Entities",
 				"x": 288,
 				"y": 128,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"On the third level, Bog decided you cannot collect flags mid-air.",
+						"It was too easy to cheese otherwise."
+					]
+				}
+			}
+		],
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "bf0792e0-fa90-11f0-9d09-51f322c38f71",
+				"layer": "Entities",
+				"x": 288,
+				"y": 352,
 				"width": 32,
 				"height": 32,
 				"color": 8978176,

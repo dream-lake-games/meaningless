@@ -1,0 +1,42 @@
+{
+	"identifier": "Level_8",
+	"uniqueIdentifer": "8f16d180-fa90-11f0-9d09-73038093753c",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Heist"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "cdc432b0-fa90-11f0-9d09-0d70e0b5d7ee",
+				"layer": "Entities",
+				"x": 128,
+				"y": 288,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "f687fd30-fa90-11f0-9d09-258284c8def4",
+				"layer": "Entities",
+				"x": 352,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

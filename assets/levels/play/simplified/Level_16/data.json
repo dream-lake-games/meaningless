@@ -1,0 +1,60 @@
+{
+	"identifier": "Level_16",
+	"uniqueIdentifer": "29095ae0-fa90-11f0-9d09-274ddf080df3",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": ""
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "34778870-fa90-11f0-9d09-b9462363340c",
+				"layer": "Entities",
+				"x": 192,
+				"y": 288,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Sign": [
+			{
+				"id": "Sign",
+				"iid": "35d8ed30-fa90-11f0-9d09-4f5426fbe987",
+				"layer": "Entities",
+				"x": 448,
+				"y": 288,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"Bog wanted to make more levels.",
+						"But then Bog got tired."
+					]
+				}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "415090a0-fa90-11f0-9d09-efd3c816ccc7",
+				"layer": "Entities",
+				"x": 512,
+				"y": 288,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

@@ -1,0 +1,64 @@
+{
+	"identifier": "Level_4",
+	"uniqueIdentifer": "ba1ea950-fa90-11f0-b242-cfd4dbb89f52",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Incohesive"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "d056ae20-fa90-11f0-b242-654ca2edfdd9",
+				"layer": "Entities",
+				"x": 96,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Sign": [
+			{
+				"id": "Sign",
+				"iid": "737922f0-fa90-11f0-9d09-7bc962b2e0fb",
+				"layer": "Entities",
+				"x": 160,
+				"y": 320,
+				"width": 32,
+				"height": 32,
+				"color": 11955711,
+				"customFields": {
+					"text": [
+						"Even Bog agrees cell transitions are hard to predict.",
+						"Luckily, the cells themselves give some indication.",
+						"The LEFT half of a cell will show what will happen if you tick BACKWARDS.",
+						"The RIGHT half of a cell will show what will happen if you tick FORWARDS.",
+						"You'll get used to it.",
+						"Bog believes in you."
+					]
+				}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "49736d20-fa90-11f0-9d09-d74f054ad620",
+				"layer": "Entities",
+				"x": 480,
+				"y": 352,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

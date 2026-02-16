@@ -9,14 +9,14 @@ use crate::animations::{LeftCellAnim, PlayerAnim, RightCellAnim};
 use crate::level::{DynamicCell, LevelSystemSet, NeverCell, PermanentCell, Spike};
 use crate::menu::AppState;
 use crate::menu::navigation::ControlScheme;
-use crate::player::{Player, PlayerState};
+use crate::player::{HITBOX_HEIGHT, HITBOX_OFFSET_Y, HITBOX_WIDTH, Player, PlayerState};
+use crate::sfx::{self, Sfx};
 use crate::sign::DialogueState;
 
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub(crate) struct GolSystemSet;
 
-const PLAYER_SIZE: f32 = 18.0;
-const CRUSH_THRESHOLD: f32 = 0.25;
+const CRUSH_THRESHOLD: f32 = 0.4;
 const HISTORY_CAP: usize = 256;
 
 #[derive(Resource, Default)]
@@ -227,10 +227,12 @@ fn init_from_ldtk(
 }
 
 fn process_tick_input(
+    mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
     controls: Res<ControlScheme>,
     dialogue: Res<DialogueState>,
     death_rewind: Res<DeathRewind>,
+    sfx: Res<Sfx>,
     mut tick_state: ResMut<TickState>,
 ) {
     if !tick_state.initialized || dialogue.active || death_rewind.phase != DeathPhase::None {
@@ -259,6 +261,7 @@ fn process_tick_input(
         tick_state.previous = Some(old_current.clone());
         tick_state.current = std::mem::take(&mut tick_state.next);
         tick_state.next = tick_state.compute_next();
+        sfx::play_forward(&mut commands, &sfx);
     } else if backward {
         if tick_state.history.is_empty() {
             return;
@@ -268,6 +271,7 @@ fn process_tick_input(
         tick_state.previous = tick_state.history.last().cloned();
         tick_state.current = restored;
         tick_state.next = tick_state.compute_next();
+        sfx::play_backward(&mut commands, &sfx);
     }
 }
 
@@ -275,6 +279,8 @@ const FALL_DEATH_DISTANCE: f32 = 128.0;
 const SPIKE_HITBOX: f32 = 34.0;
 
 fn check_spike_collision(
+    mut commands: Commands,
+    sfx: Res<Sfx>,
     mut death_rewind: ResMut<DeathRewind>,
     mut player_query: Query<(&Transform, &mut AnimMan<PlayerAnim>), With<Player>>,
     spike_query: Query<&Transform, (With<Spike>, Without<Player>)>,
@@ -287,26 +293,30 @@ fn check_spike_collision(
         return;
     };
 
-    let player_pos = player_tf.translation.truncate();
-    let player_half = PLAYER_SIZE / 2.0;
+    let player_pos = player_tf.translation.truncate() + Vec2::new(0.0, HITBOX_OFFSET_Y);
+    let player_half_w = HITBOX_WIDTH / 2.0;
+    let player_half_h = HITBOX_HEIGHT / 2.0;
     let spike_half = SPIKE_HITBOX / 2.0;
 
     for spike_tf in &spike_query {
         let spike_pos = spike_tf.translation.truncate();
         let diff = (player_pos - spike_pos).abs();
 
-        if diff.x < player_half + spike_half && diff.y < player_half + spike_half {
+        if diff.x < player_half_w + spike_half && diff.y < player_half_h + spike_half {
             player_anim.set(PlayerAnim::Die);
             death_rewind.phase = DeathPhase::Dying;
             death_rewind.timer = 0.0;
+            sfx::play_death(&mut commands, &sfx);
             return;
         }
     }
 }
 
 fn check_restart_input(
+    mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
     dialogue: Res<DialogueState>,
+    sfx: Res<Sfx>,
     mut death_rewind: ResMut<DeathRewind>,
     mut player_query: Query<&mut AnimMan<PlayerAnim>, With<Player>>,
 ) {
@@ -319,11 +329,14 @@ fn check_restart_input(
             player_anim.set(PlayerAnim::Die);
             death_rewind.phase = DeathPhase::Dying;
             death_rewind.timer = 0.0;
+            sfx::play_death(&mut commands, &sfx);
         }
     }
 }
 
 fn check_player_collision(
+    mut commands: Commands,
+    sfx: Res<Sfx>,
     tick_state: Res<TickState>,
     mut death_rewind: ResMut<DeathRewind>,
     mut player_query: Query<(&Transform, &mut AnimMan<PlayerAnim>), With<Player>>,
@@ -336,12 +349,11 @@ fn check_player_collision(
         return;
     };
 
-    let player_pos = player_tf.translation.truncate();
-    let player_half = PLAYER_SIZE / 2.0;
-    let player_area = PLAYER_SIZE * PLAYER_SIZE;
+    let player_pos = player_tf.translation.truncate() + Vec2::new(0.0, HITBOX_OFFSET_Y);
+    let player_half = Vec2::new(HITBOX_WIDTH / 2.0, HITBOX_HEIGHT / 2.0);
+    let player_area = HITBOX_WIDTH * HITBOX_HEIGHT;
     let tile_half = TILE_SIZE / 2.0;
 
-    // Check for crush death
     for &pos in &tick_state.current {
         let cell_world_pos = grid_to_world(pos);
         let overlap = calculate_overlap(player_pos, player_half, cell_world_pos, tile_half);
@@ -356,11 +368,11 @@ fn check_player_collision(
             player_anim.set(PlayerAnim::Die);
             death_rewind.phase = DeathPhase::Dying;
             death_rewind.timer = 0.0;
+            sfx::play_death(&mut commands, &sfx);
             return;
         }
     }
 
-    // Check for fall death - find lowest cell (permanent or dynamic)
     let lowest_y = tick_state
         .permanent
         .iter()
@@ -374,6 +386,7 @@ fn check_player_collision(
             player_anim.set(PlayerAnim::Die);
             death_rewind.phase = DeathPhase::Dying;
             death_rewind.timer = 0.0;
+            sfx::play_death(&mut commands, &sfx);
         }
     }
 }
@@ -492,8 +505,8 @@ fn handle_player_push(
         return;
     };
 
-    let player_pos = player_tf.translation.truncate();
-    let player_half = PLAYER_SIZE / 2.0;
+    let player_pos = player_tf.translation.truncate() + Vec2::new(0.0, HITBOX_OFFSET_Y);
+    let player_half = Vec2::new(HITBOX_WIDTH / 2.0, HITBOX_HEIGHT / 2.0);
     let tile_half = TILE_SIZE / 2.0;
 
     for &pos in &tick_state.current {
@@ -508,8 +521,8 @@ fn handle_player_push(
             find_push_direction(player_pos, player_half, cell_world_pos, tile_half)
         {
             let new_pos = player_pos + dir * amount;
-            player_tf.translation.x = new_pos.x;
-            player_tf.translation.y = new_pos.y;
+            player_tf.translation.x = new_pos.x.round();
+            player_tf.translation.y = new_pos.y.round();
 
             if dir.x != 0.0 {
                 player_state.vx = 0.0;
@@ -528,9 +541,9 @@ fn grid_to_world(grid_pos: IVec2) -> Vec2 {
     )
 }
 
-fn calculate_overlap(player_pos: Vec2, player_half: f32, cell_pos: Vec2, cell_half: f32) -> f32 {
-    let player_min = player_pos - Vec2::splat(player_half);
-    let player_max = player_pos + Vec2::splat(player_half);
+fn calculate_overlap(player_pos: Vec2, player_half: Vec2, cell_pos: Vec2, cell_half: f32) -> f32 {
+    let player_min = player_pos - player_half;
+    let player_max = player_pos + player_half;
     let cell_min = cell_pos - Vec2::splat(cell_half);
     let cell_max = cell_pos + Vec2::splat(cell_half);
 
@@ -542,12 +555,12 @@ fn calculate_overlap(player_pos: Vec2, player_half: f32, cell_pos: Vec2, cell_ha
 
 fn find_push_direction(
     player_pos: Vec2,
-    player_half: f32,
+    player_half: Vec2,
     cell_pos: Vec2,
     cell_half: f32,
 ) -> Option<(Vec2, f32)> {
-    let player_min = player_pos - Vec2::splat(player_half);
-    let player_max = player_pos + Vec2::splat(player_half);
+    let player_min = player_pos - player_half;
+    let player_max = player_pos + player_half;
     let cell_min = cell_pos - Vec2::splat(cell_half);
     let cell_max = cell_pos + Vec2::splat(cell_half);
 

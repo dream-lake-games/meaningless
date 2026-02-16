@@ -2,6 +2,7 @@ use bevy::prelude::*;
 use bevy_ecs_ldtk::prelude::*;
 
 use crate::menu::AppState;
+use crate::sfx::{self, Sfx};
 
 const TRANSITION_COOLDOWN: f32 = 0.3;
 
@@ -73,8 +74,10 @@ impl Default for MenuNavigation {
 }
 
 fn navigate_menu(
+    mut commands: Commands,
     time: Res<Time>,
     keyboard: Res<ButtonInput<KeyCode>>,
+    sfx: Res<Sfx>,
     mut nav: ResMut<MenuNavigation>,
     mut level_selection: ResMut<LevelSelection>,
     mut controls: ResMut<ControlScheme>,
@@ -117,6 +120,7 @@ fn navigate_menu(
             *controls = controls.toggle();
             nav.cooldown_remaining = TRANSITION_COOLDOWN;
             nav.waiting_for_release = true;
+            sfx::play_menu_move(&mut commands, &sfx);
             return;
         }
     }
@@ -145,6 +149,7 @@ fn navigate_menu(
         nav.cooldown_remaining = TRANSITION_COOLDOWN;
         nav.waiting_for_release = true;
         *level_selection = LevelSelection::index(screen.level_index());
+        sfx::play_menu_select(&mut commands, &sfx);
     }
 }
 

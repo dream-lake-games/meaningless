@@ -1,0 +1,42 @@
+{
+	"identifier": "Level_15",
+	"uniqueIdentifer": "b5d8aa20-fa90-11f0-9d09-19dd1dde76fb",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Patience"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "f9fa43c0-fa90-11f0-9d09-7dcf2e1b28ea",
+				"layer": "Entities",
+				"x": 288,
+				"y": 96,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "247c4390-fa90-11f0-9d09-a54e59fb739e",
+				"layer": "Entities",
+				"x": 128,
+				"y": 256,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

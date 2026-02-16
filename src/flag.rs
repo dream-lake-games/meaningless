@@ -4,10 +4,11 @@ use bevy_ecs_ldtk::prelude::*;
 use crate::anim::AnimMan;
 use crate::animations::{FlagAnim, FlagIndicatorAnim, PlayerAnim};
 use crate::camera::{InGameCamera, HIGH_RES_LAYERS, PIXEL_PERFECT_LAYERS};
-use crate::gol::{DeathPhase, DeathRewind};
+use crate::gol::{DeathPhase, DeathRewind, GolSystemSet};
 use crate::level_progress::LevelProgress;
 use crate::menu::AppState;
 use crate::player::{Player, PlayerState};
+use crate::sfx::{self, Sfx};
 use crate::transition::{TransitionState, TransitionTarget};
 
 const COLLECT_WIDTH: f32 = 8.0;
@@ -33,10 +34,11 @@ struct FlagBundle {
 }
 
 #[derive(Resource, Default)]
-struct FlagCounter {
+pub(crate) struct FlagCounter {
     collected: usize,
     total: usize,
     complete_timer: Option<f32>,
+    pub(crate) level_complete: bool,
 }
 
 const COMPLETE_DELAY: f32 = 0.3;
@@ -72,6 +74,7 @@ fn count_flags(mut counter: ResMut<FlagCounter>, query: Query<(), With<Flag>>) {
 
 fn collect_flags(
     mut commands: Commands,
+    sfx: Res<Sfx>,
     mut counter: ResMut<FlagCounter>,
     mut player_query: Query<
         (&Transform, &mut PlayerState, &mut AnimMan<PlayerAnim>),
@@ -86,6 +89,12 @@ fn collect_flags(
         return;
     };
 
+    let current_anim = player_anim.get();
+    let can_collect = current_anim == PlayerAnim::Idle || current_anim == PlayerAnim::Run;
+    if !can_collect {
+        return;
+    }
+
     let player_pos = player_tf.translation.truncate();
 
     for (entity, flag_tf, mut anim) in &mut flag_query {
@@ -96,6 +105,7 @@ fn collect_flags(
             commands.entity(entity).insert(FlagCollected);
             anim.set(FlagAnim::Bare);
             counter.collected += 1;
+            sfx::play_flag_get(&mut commands, &sfx);
 
             player_state.vx = 0.0;
             player_state.vy = 0.0;
@@ -103,6 +113,7 @@ fn collect_flags(
 
             if counter.collected == counter.total {
                 counter.complete_timer = Some(COMPLETE_DELAY);
+                counter.level_complete = true;
             }
         }
     }
@@ -159,6 +170,7 @@ fn reset_flags_on_death(
     }
     counter.collected = 0;
     counter.complete_timer = None;
+    counter.level_complete = false;
 }
 
 fn spawn_counter_ui(
@@ -170,8 +182,8 @@ fn spawn_counter_ui(
 
     let level_name = progress
         .current_playing
-        .map(|l| progress.get_level_name(l))
-        .unwrap_or("???");
+        .map(|l| format!("\"{}\"", progress.get_level_name(l)))
+        .unwrap_or("\"???\"".to_string());
 
     commands.spawn((
         LevelNameText,
@@ -231,6 +243,7 @@ fn cleanup_flags(mut counter: ResMut<FlagCounter>) {
     counter.collected = 0;
     counter.total = 0;
     counter.complete_timer = None;
+    counter.level_complete = false;
 }
 
 fn update_flag_indicators(
@@ -310,6 +323,7 @@ pub(crate) fn flag_plugin_fn(app: &mut App) {
                 update_counter_ui,
             )
                 .chain()
+                .after(GolSystemSet)
                 .run_if(in_state(AppState::Playing)),
         )
         .add_systems(

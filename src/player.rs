@@ -3,13 +3,19 @@ use bevy::prelude::*;
 
 use crate::anim::AnimMan;
 use crate::animations::PlayerAnim;
+use crate::flag::FlagCounter;
+use crate::gol::{DeathPhase, DeathRewind, GolSystemSet};
 use crate::menu::AppState;
 use crate::menu::navigation::ControlScheme;
+use crate::sfx::{self, Sfx};
 use crate::sign::DialogueState;
 
-const HITBOX_WIDTH: f32 = 12.0;
-const HITBOX_HEIGHT: f32 = 14.0;
-const HITBOX_OFFSET_Y: f32 = -2.0;
+#[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
+pub(crate) struct PlayerSystemSet;
+
+pub(crate) const HITBOX_WIDTH: f32 = 14.0;
+pub(crate) const HITBOX_HEIGHT: f32 = 14.0;
+pub(crate) const HITBOX_OFFSET_Y: f32 = -2.0;
 
 const MOVE_SPEED: f32 = 150.0;
 const GROUND_ACCEL: f32 = 4000.0;
@@ -40,6 +46,7 @@ pub(crate) struct PlayerState {
     coyote_timer: f32,
     jump_buffer_timer: f32,
     jump_held: bool,
+    last_anim_frame: usize,
 }
 
 impl Default for PlayerState {
@@ -54,6 +61,7 @@ impl Default for PlayerState {
             coyote_timer: 0.0,
             jump_buffer_timer: 0.0,
             jump_held: false,
+            last_anim_frame: 0,
         }
     }
 }
@@ -72,14 +80,18 @@ pub(crate) fn spawn_player(commands: &mut Commands, pos: Vec2) {
 }
 
 fn player_system(
+    mut commands: Commands,
     keyboard: Res<ButtonInput<KeyCode>>,
     time: Res<Time>,
     spatial: SpatialQuery,
     controls: Res<ControlScheme>,
     dialogue: Res<DialogueState>,
+    death_rewind: Res<DeathRewind>,
+    flag_counter: Res<FlagCounter>,
+    sfx: Res<Sfx>,
     mut query: Query<(&mut Transform, &mut PlayerState, &mut AnimMan<PlayerAnim>), With<Player>>,
 ) {
-    if dialogue.active {
+    if dialogue.active || death_rewind.phase != DeathPhase::None || flag_counter.level_complete {
         return;
     }
     let dt = time.delta_secs();
@@ -112,6 +124,22 @@ fn player_system(
         }
         state.jump_buffer_timer -= dt;
 
+        let pos = tf.translation.truncate();
+        let hitbox_pos = pos + Vec2::new(0.0, HITBOX_OFFSET_Y);
+
+        let mut can_move_x = true;
+        if input_dir != 0.0 && state.vx.abs() < 1.0 {
+            let check_dir = if input_dir > 0.0 {
+                Dir2::X
+            } else {
+                Dir2::NEG_X
+            };
+            let check_config = ShapeCastConfig::from_max_distance(1.0);
+            can_move_x = spatial
+                .cast_shape(&shape, hitbox_pos, 0.0, check_dir, &check_config, &filter)
+                .is_none();
+        }
+
         let target_vx = input_dir * MOVE_SPEED;
         let (accel, decel) = if state.grounded {
             (GROUND_ACCEL, GROUND_DECEL)
@@ -119,7 +147,7 @@ fn player_system(
             (AIR_ACCEL, AIR_DECEL)
         };
 
-        if input_dir != 0.0 {
+        if input_dir != 0.0 && can_move_x {
             state.vx = move_toward(state.vx, target_vx, accel * dt);
         } else {
             state.vx = move_toward(state.vx, 0.0, decel * dt);
@@ -131,6 +159,7 @@ fn player_system(
             state.coyote_timer = 0.0;
             state.jump_buffer_timer = 0.0;
             just_jumped = true;
+            sfx::play_jump(&mut commands, &sfx);
         }
 
         let mut grav = GRAVITY;
@@ -152,7 +181,10 @@ fn player_system(
             if let Some(hit) =
                 spatial.cast_shape(&shape, hitbox_pos, 0.0, move_dir, &config, &filter)
             {
-                pos.x += move_dir.as_vec2().x * (hit.distance - SKIN).max(0.0);
+                let movement = (hit.distance - SKIN).max(0.0);
+                if movement > 0.01 {
+                    pos.x += move_dir.as_vec2().x * movement;
+                }
                 state.vx = 0.0;
             } else {
                 pos.x += dx;
@@ -205,9 +237,10 @@ fn player_system(
                 Dir2::NEG_X
             };
             let wall_check = ShapeCastConfig::from_max_distance(2.0);
-            state.pushing_wall = spatial
-                .cast_shape(&shape, hitbox_pos, 0.0, wall_dir, &wall_check, &filter)
-                .is_some();
+            let wall_hit =
+                spatial.cast_shape(&shape, hitbox_pos, 0.0, wall_dir, &wall_check, &filter);
+            state.pushing_wall = wall_hit.is_some();
+
         }
 
         pos.x = pos.x.round();
@@ -219,6 +252,9 @@ fn player_system(
         anim.set_flip_x(!state.facing_right);
 
         let just_landed = state.grounded && !state.was_grounded;
+        if just_landed {
+            sfx::play_landing(&mut commands, &sfx);
+        }
         let current = anim.get();
         let (down_key, up_key) = match *controls {
             ControlScheme::Arrow => (KeyCode::ArrowDown, KeyCode::ArrowUp),
@@ -261,6 +297,12 @@ fn player_system(
 
         anim.set(new_anim);
 
+        let current_frame = anim.frame();
+        if anim.get() == PlayerAnim::Run && current_frame == 1 && state.last_anim_frame != 1 {
+            sfx::play_footstep(&mut commands, &sfx);
+        }
+        state.last_anim_frame = current_frame;
+
         state.was_grounded = state.grounded;
     }
 }
@@ -276,5 +318,11 @@ fn move_toward(current: f32, target: f32, max_step: f32) -> f32 {
 }
 
 pub(crate) fn player_plugin_fn(app: &mut App) {
-    app.add_systems(Update, player_system.run_if(in_state(AppState::Playing)));
+    app.add_systems(
+        Update,
+        player_system
+            .in_set(PlayerSystemSet)
+            .after(GolSystemSet)
+            .run_if(in_state(AppState::Playing)),
+    );
 }

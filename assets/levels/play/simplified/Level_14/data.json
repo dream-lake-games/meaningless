@@ -1,0 +1,42 @@
+{
+	"identifier": "Level_14",
+	"uniqueIdentifer": "b842a540-fa90-11f0-9d09-29bbc0e41806",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Up 'n Down"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "a1c62090-fa90-11f0-9d09-d310612ea138",
+				"layer": "Entities",
+				"x": 64,
+				"y": 352,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "d2524220-fa90-11f0-9d09-e941bf8b64d6",
+				"layer": "Entities",
+				"x": 416,
+				"y": 352,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}

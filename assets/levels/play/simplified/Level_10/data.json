@@ -1,0 +1,42 @@
+{
+	"identifier": "Level_10",
+	"uniqueIdentifer": "b50fb4d0-fa90-11f0-9d09-87062103a7f9",
+	"x": -1,
+	"y": -1,
+	"width": 640,
+	"height": 640,
+	"bgColor": "#696A79",
+	"neighbourLevels": [],
+	"customFields": {
+		"Name": "Beehive Removal"
+	},
+	"layers": [],
+	"entities": {
+		"PlayerSpawn": [
+			{
+				"id": "PlayerSpawn",
+				"iid": "83c4baa0-fa90-11f0-9d09-4736075742e2",
+				"layer": "Entities",
+				"x": 128,
+				"y": 384,
+				"width": 32,
+				"height": 32,
+				"color": 8978176,
+				"customFields" : {}
+			}
+		],
+		"Flag": [
+			{
+				"id": "Flag",
+				"iid": "e80a48e0-fa90-11f0-9d09-3fcc94272fe4",
+				"layer": "Entities",
+				"x": 352,
+				"y": 64,
+				"width": 32,
+				"height": 32,
+				"color": 9568256,
+				"customFields" : {}
+			}
+		]
+	}
+}
